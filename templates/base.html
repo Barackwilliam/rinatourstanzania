@@ -1,0 +1,293 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{% block title %}{{ SITE_NAME }} — Tanzania Safaris, Kilimanjaro & Zanzibar{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}{{ SITE_NAME }} arranges safaris, Kilimanjaro treks, Zanzibar beach holidays, cultural journeys and transfers across Tanzania.{% endblock %}">
+
+<link rel="canonical" href="{{ SITE_DOMAIN }}{{ request.get_full_path }}">
+<meta property="og:site_name" content="{{ SITE_NAME }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+<meta property="og:description" content="{% block og_description %}Safaris, treks and beach holidays across Tanzania.{% endblock %}">
+{% block og_image %}{% endblock %}
+<meta name="twitter:card" content="summary_large_image">
+
+{% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/motifs.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TravelAgency",
+  "name": "{{ SITE_NAME }}",
+  "url": "{{ SITE_DOMAIN }}",
+  "email": "{{ SITE_EMAIL }}",
+  "telephone": "{{ SITE_PHONE_PRIMARY }}",
+  "address": { "@type": "PostalAddress", "addressLocality": "{{ SITE_LOCATION }}", "addressCountry": "TZ" }
+}
+</script>
+
+{% if GOOGLE_ANALYTICS_ID %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ GOOGLE_ANALYTICS_ID }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ GOOGLE_ANALYTICS_ID }}');
+</script>
+{% endif %}
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-contact">
+      {% if SITE_PHONE_PRIMARY %}<a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a>{% endif %}
+      {% if SITE_EMAIL %}<a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>{% endif %}
+    </div>
+    <div class="topbar-social">
+      {% if SITE_INSTAGRAM %}<a href="{{ SITE_INSTAGRAM }}" rel="noopener" target="_blank">Instagram</a>{% endif %}
+      {% if SITE_FACEBOOK %}<a href="{{ SITE_FACEBOOK }}" rel="noopener" target="_blank">Facebook</a>{% endif %}
+      {% if SITE_TIKTOK %}<a href="{{ SITE_TIKTOK }}" rel="noopener" target="_blank">TikTok</a>{% endif %}
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+
+    <a class="brand" href="{% url 'tours:home' %}">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">
+        <span class="brand-name">{{ SITE_NAME }}</span>
+        <span class="brand-tagline">{% if SITE_TAGLINE %}{{ SITE_TAGLINE }}{% else %}Tanzania, at your pace{% endif %}</span>
+      </span>
+    </a>
+
+    {% comment %}
+      Pure-CSS drawer: the checkbox drives a transform, so it opens on the
+      compositor with no JavaScript to wait for.
+    {% endcomment %}
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-burger" aria-label="Open menu" role="button" tabindex="0">
+      <span></span>
+    </label>
+    <label for="nav-toggle" class="nav-scrim" aria-hidden="true"></label>
+
+    <nav class="site-nav" aria-label="Main">
+      <div class="drawer-head">
+        <span class="brand-name">{{ SITE_NAME }}</span>
+        <label for="nav-toggle" class="drawer-close" aria-label="Close menu">
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+            <path d="M4 4 L16 16 M16 4 L4 16" stroke="currentColor" stroke-width="1.8" fill="none"/>
+          </svg>
+        </label>
+      </div>
+
+      <ul class="nav-list">
+        <li><a href="{% url 'tours:home' %}">Home</a></li>
+
+        <li class="has-menu" data-menu="tours">
+          <button class="menu-trigger" aria-expanded="false" aria-controls="menu-tours">
+            Tours
+            <svg class="menu-chevron" viewBox="0 0 12 8" width="11" height="7" aria-hidden="true">
+              <path d="M1 1.5 L6 6.5 L11 1.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <div class="mega" id="menu-tours">
+            <div class="mega-inner">
+              <div class="mega-body mega-body-2">
+                <div class="mega-col">
+                  <p class="mega-heading">By experience</p>
+                  <ul class="mega-links">
+                    {% for c in nav_categories %}
+                      <li>
+                        <a href="{{ c.get_absolute_url }}">
+                          <span class="mega-bead" style="--bead:{{ c.bead_colour }}"></span>
+                          <span class="mega-text">
+                            <span class="mega-title">{{ c.name }}</span>
+                            <span class="mega-sub">{{ c.n_tours }} tour{{ c.n_tours|pluralize }}</span>
+                          </span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+
+                <div class="mega-col">
+                  <p class="mega-heading">Quick ways in</p>
+                  <ul class="mega-links">
+                    <li><a href="{% url 'tours:package_list' %}"><span class="mega-text">
+                      <span class="mega-title">All tours</span>
+                      <span class="mega-sub">Every trip, filterable</span></span></a></li>
+                    <li><a href="{% url 'tours:day_trip_list' %}"><span class="mega-text">
+                      <span class="mega-title">Day trips</span>
+                      <span class="mega-sub">Out and back the same day</span></span></a></li>
+                    <li><a href="{% url 'tours:transfers' %}"><span class="mega-text">
+                      <span class="mega-title">Transfers</span>
+                      <span class="mega-sub">Airports, hotels, city runs</span></span></a></li>
+                    <li><a href="{% url 'tours:home' %}#routes"><span class="mega-text">
+                      <span class="mega-title">Routes map</span>
+                      <span class="mega-sub">See the journeys drawn out</span></span></a></li>
+                    <li><a href="{% url 'tours:reviews' %}"><span class="mega-text">
+                      <span class="mega-title">Guest reviews</span>
+                      <span class="mega-sub">What travellers said</span></span></a></li>
+                  </ul>
+                </div>
+              </div>
+
+              {% if nav_promoted %}
+              <a class="mega-promo" href="{{ nav_promoted.get_absolute_url }}">
+                <span class="mega-promo-media">
+                  {% if nav_promoted.get_image %}<img src="{{ nav_promoted.get_image }}" alt="" loading="lazy">{% endif %}
+                </span>
+                <span class="mega-promo-body">
+                  <span class="mega-promo-label">Most booked</span>
+                  <span class="mega-promo-title">{{ nav_promoted.title }}</span>
+                  <span class="mega-promo-meta">{{ nav_promoted.duration_display }}</span>
+                  <span class="mega-promo-price">{{ nav_promoted.price_display }}</span>
+                </span>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+
+        <li class="has-menu" data-menu="destinations">
+          <button class="menu-trigger" aria-expanded="false" aria-controls="menu-destinations">
+            Destinations
+            <svg class="menu-chevron" viewBox="0 0 12 8" width="11" height="7" aria-hidden="true">
+              <path d="M1 1.5 L6 6.5 L11 1.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <div class="mega" id="menu-destinations">
+            <div class="mega-inner">
+              <div class="mega-body mega-body-3">
+                {% for region, places in nav_destination_groups.items %}
+                  <div class="mega-col">
+                    <p class="mega-heading">{{ region }}</p>
+                    <ul class="mega-links mega-links-tight">
+                      {% for d in places %}
+                        <li>
+                          <a href="{{ d.get_absolute_url }}">
+                            <span class="mega-text">
+                              <span class="mega-title">{{ d.name }}</span>
+                              <span class="mega-sub">{{ d.n_tours }} tour{{ d.n_tours|pluralize }}{% if d.from_price %} · from {{ d.from_price|floatformat:0 }} USD{% endif %}</span>
+                            </span>
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <div class="mega-foot">
+                <a class="btn btn-ghost" href="{% url 'tours:destination_list' %}">All {{ nav_destination_total }} destinations</a>
+                <a class="btn btn-ghost" href="{% url 'tours:home' %}#routes">See them on the map</a>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li><a href="{% url 'tours:reviews' %}">Reviews</a></li>
+        <li><a href="{% url 'tours:about' %}">About</a></li>
+        <li><a href="{% url 'tours:faq' %}">FAQ</a></li>
+        <li><a href="{% url 'tours:contact' %}">Contact</a></li>
+        <li class="nav-cta"><a class="btn btn-primary" href="{% url 'tours:contact' %}">Plan your trip</a></li>
+      </ul>
+
+      {% if SITE_PHONE_PRIMARY or SITE_WHATSAPP or SITE_EMAIL %}
+        <div class="drawer-foot">
+          {% if SITE_PHONE_PRIMARY %}<a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a>{% endif %}
+          {% if SITE_WHATSAPP %}<a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">WhatsApp us</a>{% endif %}
+          {% if SITE_EMAIL %}<a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>{% endif %}
+        </div>
+      {% endif %}
+    </nav>
+
+  </div>
+</header>
+
+{% if messages %}
+<div class="container">
+  {% for message in messages %}
+    <p class="flash flash-{{ message.tags }}">{{ message }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main id="main">{% block content %}{% endblock %}</main>
+
+<footer class="site-footer">
+  {% if footer_images %}
+    <div class="footer-bg" aria-hidden="true">
+      {% for src in footer_images %}
+        <div class="footer-bg-layer{% if forloop.first %} is-active{% endif %}"
+             style="background-image:url('{{ src }}')"></div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="container footer-grid">
+    <div>
+      <span class="brand-name footer-brand-name">{{ SITE_NAME }}</span>
+      <p class="footer-blurb">Safaris, mountain treks, beach holidays and cultural journeys across Tanzania.</p>
+      {% if SITE_LOCATION %}<p class="footer-line">{{ SITE_LOCATION }}</p>{% endif %}
+    </div>
+
+    <div>
+      <p class="footer-heading">Tours</p>
+      <ul class="footer-links">
+        {% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-heading">Company</p>
+      <ul class="footer-links">
+        <li><a href="{% url 'tours:about' %}">About us</a></li>
+        <li><a href="{% url 'tours:destination_list' %}">Destinations</a></li>
+        <li><a href="{% url 'tours:transfers' %}">Transfers</a></li>
+        <li><a href="{% url 'tours:reviews' %}">Reviews</a></li>
+        <li><a href="{% url 'tours:faq' %}">FAQ</a></li>
+        <li><a href="{% url 'tours:contact' %}">Contact</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-heading">Get in touch</p>
+      <ul class="footer-links">
+        {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a></li>{% endif %}
+        {% if SITE_PHONE_SECONDARY %}<li><a href="tel:{{ SITE_PHONE_SECONDARY|cut:' ' }}">{{ SITE_PHONE_SECONDARY }}</a></li>{% endif %}
+        {% if SITE_EMAIL %}<li><a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a></li>{% endif %}
+        {% if SITE_WHATSAPP %}<li><a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">WhatsApp</a></li>{% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>&copy; {% now "Y" %} {{ SITE_NAME }}. All rights reserved.</span>
+    <span class="footer-legal">
+      <a href="{% url 'tours:privacy_policy' %}">Privacy</a>
+      <a href="{% url 'tours:terms' %}">Terms</a>
+    </span>
+  </div>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

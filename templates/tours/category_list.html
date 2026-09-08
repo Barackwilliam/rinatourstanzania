@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Tour categories — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Tour categories</h1></div></section>
+<section class="section"><div class="container">
+  <div class="category-grid">
+    {% for c in categories %}
+      <a class="category-tile" href="{{ c.get_absolute_url }}" style="--tile-bead:{{ c.bead_colour }}">
+        {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy">{% endif %}
+        <span class="category-tile-body">
+          <span class="category-tile-name">{{ c.name }}</span>
+          <span class="category-tile-count">{{ c.package_count }} tours</span>
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

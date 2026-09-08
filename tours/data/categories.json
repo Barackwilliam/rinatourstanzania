@@ -1,0 +1,188 @@
+[
+  {
+    "source_file": "02-trekking-mountain.txt",
+    "recommendations": {
+      "recommended featured package": "Mount Kilimanjaro – 7 Days Machame Route",
+      "recommended short trek": "Materuni Waterfall & Village Hike",
+      "recommended beginner experience": "Kilimanjaro Foothills Day Hike",
+      "recommended adventure": "Ol Doinyo Lengai Trekking",
+      "recommended alternative mountain": "Mount Meru Trek"
+    },
+    "name": "Trekking / Mountain Climbing",
+    "slug": "trekking-mountain-climbing",
+    "code": "TREKKING",
+    "description": "Explore Tanzania's spectacular mountains, highlands, forests and volcanic landscapes with Rina Tours Tanzania. From the legendary Mount Kilimanjaro and Mount Meru to the scenic Usambara, Uluguru and Udzungwa Mountains, our trekking experiences are designed for adventure seekers, nature lovers and travellers looking for unforgettable experiences in the heart of Tanzania.",
+    "featured": [
+      "Mount Kilimanjaro – Machame Route",
+      "Mount Kilimanjaro – Lemosho Route",
+      "Mount Kilimanjaro – Marangu Route",
+      "Mount Meru Trek",
+      "Materuni Waterfall & Village Hike",
+      "Usambara Mountains Trekking",
+      "Ol Doinyo Lengai Adventure",
+      "Ngorongoro Highlands Trekking"
+    ]
+  },
+  {
+    "source_file": "03-beach-coastal.txt",
+    "recommendations": {
+      "recommended featured package": "Zanzibar Beach & Stone Town Tour",
+      "recommended day trip": "Safari Blue Day Tour",
+      "recommended family package": "Zanzibar Beach Escape",
+      "recommended romantic package": "Zanzibar Romantic Beach Getaway",
+      "recommended adventure": "Mnemba Island Snorkeling Day Trip",
+      "recommended tanzania mainland beach": "Saadani Beach & Wildlife Experience",
+      "recommended dar es salaam day trip": "Bongoyo Island Day Trip"
+    },
+    "name": "Beach / Coastal Tours",
+    "slug": "beach-coastal-tours",
+    "code": "BEACH",
+    "description": "Discover Tanzania's spectacular Indian Ocean coastline with Rina Tours Tanzania. From the tropical beaches of Zanzibar and the historic streets of Stone Town to the peaceful islands of Dar es Salaam, Saadani, Pangani and Tanga, our beach and coastal experiences combine relaxation, adventure, marine activities and authentic Swahili culture.",
+    "featured": [
+      "Zanzibar Beach Escape",
+      "Zanzibar Beach & Stone Town Tour",
+      "Zanzibar Beach & Spice Tour",
+      "Nungwi Beach Escape",
+      "Kendwa Beach Holiday",
+      "Safari Blue Day Tour",
+      "Mnemba Island Snorkeling",
+      "Prison Island & Nakupenda Sandbank",
+      "Saadani Beach & Wildlife Experience",
+      "Zanzibar Honeymoon Beach Package"
+    ]
+  },
+  {
+    "source_file": "04-cultural-tours.txt",
+    "recommendations": {
+      "recommended day trip": "Stone Town Cultural Tour",
+      "recommended family package": "Mto wa Mbu Cultural Tour",
+      "recommended zanzibar package": "Zanzibar Cultural Discovery",
+      "recommended maasai experience": "Maasai Village Cultural Experience",
+      "recommended food experience": "Swahili Cooking Class Zanzibar",
+      "recommended historical package": "Bagamoyo Historical & Cultural Tour",
+      "recommended northern tanzania package": "Northern Tanzania Cultural Circuit",
+      "recommended long cultural tour": "Ultimate Tanzania Culture & Heritage Experience",
+      "recommended premium cultural package": "Tanzania Cultural & Heritage Circuit"
+    },
+    "name": "Cultural Tours",
+    "slug": "cultural-tours",
+    "code": "CULTURAL",
+    "description": "Discover Tanzania through its diverse cultures, traditions, communities, food, history, architecture and heritage. Cultural Tours connect travelers with Maasai, Chagga, Hadzabe, Datoga, Sukuma, Iraqw and Swahili communities while exploring historic towns, villages, markets, traditional farms and coastal heritage destinations.",
+    "featured": [
+      "Stone Town Cultural Tour",
+      "Zanzibar Spice & Cultural Tour",
+      "Maasai Village Cultural Experience",
+      "Hadzabe & Datoga Cultural Experience",
+      "Mto wa Mbu Cultural Tour",
+      "Materuni Village & Coffee Experience",
+      "Bagamoyo Historical & Cultural Tour",
+      "Chagga Culture & Coffee Tour",
+      "Swahili Cooking Class Zanzibar",
+      "Tanzania Cultural & Heritage Circuit"
+    ],
+    "main_destinations": [
+      "Zanzibar",
+      "Stone Town",
+      "Arusha",
+      "Moshi",
+      "Mto wa Mbu",
+      "Lake Eyasi",
+      "Bagamoyo",
+      "Dar es Salaam",
+      "Tanga",
+      "Mikindani",
+      "Mtwara",
+      "Karatu",
+      "Kilimanjaro Region",
+      "Mwanza",
+      "Northern Tanzania"
+    ]
+  },
+  {
+    "source_file": "05-nature-tours.txt",
+    "recommendations": {
+      "recommended day trip": "Materuni Waterfall & Forest Nature Tour",
+      "recommended family package": "Arusha National Park Nature Tour",
+      "recommended adventure": "Lake Chala Nature Adventure",
+      "recommended bird watching package": "Tanzania Bird Watching Experience",
+      "recommended zanzibar nature package": "Zanzibar Nature & Island Discovery",
+      "recommended premium nature package": "Ultimate Tanzania Nature Adventure"
+    },
+    "name": "Nature Tours",
+    "slug": "nature-tours",
+    "code": "NATURE",
+    "description": "Explore Tanzania's diverse natural environments through forests, mountains, waterfalls, lakes, crater landscapes, wildlife habitats and tropical ecosystems. Rina Tours Tanzania offers nature experiences ranging from short day trips to multi-day adventures for travellers interested in hiking, bird watching, photography, conservation and outdoor exploration.",
+    "featured": [
+      "Arusha National Park Nature Tour",
+      "Materuni Waterfall & Forest Nature Tour",
+      "Chemka Hot Springs Nature Escape",
+      "Lake Chala Nature Adventure",
+      "Usambara Mountains Nature Tour",
+      "Udzungwa Mountains Nature Experience",
+      "Jozani Forest Nature Tour",
+      "Lake Natron Nature Adventure",
+      "Empakai Crater Nature Hike",
+      "Tanzania Bird Watching Experience"
+    ]
+  },
+  {
+    "source_file": "06-water-sports-marine.txt",
+    "recommendations": {
+      "recommended day trip": "Safari Blue Marine Adventure",
+      "recommended adventure": "Mnemba Island Snorkeling Adventure",
+      "recommended romantic activity": "Private Sunset Dhow Cruise",
+      "recommended water sport": "Kite Surfing Zanzibar",
+      "recommended diving experience": "Zanzibar Diving Experience",
+      "recommended fishing experience": "Deep Sea Fishing Zanzibar",
+      "recommended dar es salaam activity": "Dar es Salaam Snorkeling & Island Tour",
+      "recommended family activity": "Nakupenda Sandbank Ocean Experience",
+      "recommended premium package": "Ultimate Zanzibar Water Sports Package"
+    },
+    "name": "Water Sports & Marine Activities",
+    "slug": "water-sports-marine-activities",
+    "code": "WATER-SPORTS",
+    "description": "Experience Tanzania's spectacular Indian Ocean through exciting water sports and marine activities. Rina Tours Tanzania offers snorkeling, diving, kayaking, paddleboarding, fishing, dhow cruises, dolphin experiences, sandbank excursions, kite surfing and other ocean adventures across Zanzibar and the Tanzanian coast.",
+    "featured": [
+      "Zanzibar Snorkeling Experience",
+      "Mnemba Island Snorkeling Adventure",
+      "Safari Blue Marine Adventure",
+      "Zanzibar Diving Experience",
+      "Deep Sea Fishing Zanzibar",
+      "Sunset Dhow Cruise",
+      "Dolphin Watching & Swimming Experience",
+      "Kite Surfing Zanzibar",
+      "Prison Island Boat & Snorkeling Tour",
+      "Nakupenda Sandbank Ocean Experience"
+    ]
+  },
+  {
+    "source_file": "07-camping-tours.txt",
+    "recommendations": {
+      "recommended budget package": "Budget Camping Safari – Tarangire & Ngorongoro",
+      "recommended wildlife package": "Serengeti Camping Safari",
+      "recommended short package": "Tarangire Camping Safari",
+      "recommended mountain package": "Usambara Mountains Camping Tour",
+      "recommended beach package": "Zanzibar Beach Camping Experience",
+      "recommended dar es salaam package": "Mikumi National Park Camping Safari",
+      "recommended nature package": "Udzungwa Mountains Camping Adventure",
+      "recommended adventure package": "Ol Doinyo Lengai Camping Adventure",
+      "recommended premium/extended package": "Ultimate Tanzania Wilderness Camping Adventure"
+    },
+    "name": "Camping Tours",
+    "slug": "camping-tours",
+    "code": "CAMPING",
+    "description": "Experience Tanzania's wilderness through authentic camping adventures across national parks, mountains, forests, lakes and coastal environments. Rina Tours Tanzania offers budget camping safaris, wilderness camping, mountain camping, beach camping and multi-day camping experiences for travellers seeking adventure, nature and an authentic connection with Tanzania.",
+    "featured": [
+      "Serengeti Camping Safari",
+      "Ngorongoro Crater Camping Adventure",
+      "5 Days Northern Circuit Camping Safari",
+      "6 Days Tanzania Budget Camping Safari",
+      "Mikumi National Park Camping Safari",
+      "Saadani National Park Camping Safari",
+      "Usambara Mountains Camping Tour",
+      "Udzungwa Mountains Camping Adventure",
+      "Lake Natron Wilderness Camping",
+      "Zanzibar Beach Camping Experience"
+    ]
+  }
+]

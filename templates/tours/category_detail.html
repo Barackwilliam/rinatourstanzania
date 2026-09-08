@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ category.description|truncatewords:28 }}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <nav class="crumbs"><a href="{% url 'tours:category_list' %}">Categories</a></nav>
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}<p class="lede">{{ category.description }}</p>{% endif %}
+    <p class="page-head-meta">{{ total }} tour{{ total|pluralize }}</p>
+  </div>
+</section>
+<section class="section"><div class="container">
+  <div class="tour-grid">
+    {% for package in packages %}{% include "tours/partials/package_card.html" %}{% endfor %}
+  </div>
+  {% include "tours/partials/pagination.html" %}
+</div></section>
+{% endblock %}

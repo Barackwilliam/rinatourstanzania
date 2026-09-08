@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Reviews — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Guest reviews</h1></div></section>
+<section class="section"><div class="container">
+  <div class="testi-grid">
+    {% for t in testimonials %}
+      <figure class="testi testi-light">
+        <blockquote>{{ t.quote }}</blockquote>
+        <figcaption>
+          {{ t.author_name }}{% if t.author_country %}, {{ t.author_country }}{% endif %}
+          {% if t.package %}<a class="testi-package" href="{{ t.package.get_absolute_url }}">{{ t.package.title }}</a>{% endif %}
+        </figcaption>
+      </figure>
+    {% empty %}
+      <p class="empty">No reviews published yet.</p>
+    {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

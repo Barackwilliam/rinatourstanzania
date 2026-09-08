@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Transfers & transport — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container">
+  <h1>Transfers and transport</h1>
+  <p>Airport pickups, hotel drop-offs, city tours and long-distance travel with our own drivers.</p>
+</div></section>
+<section class="section"><div class="container">
+  <div class="service-grid">
+    {% for t in transfers %}
+      <div class="service-card">
+        <h2>{{ t.name }}</h2>
+        {% if t.description %}<p>{{ t.description }}</p>{% endif %}
+      </div>
+    {% empty %}
+      <p class="empty">Transfer services will be listed here shortly. <a href="{% url 'tours:contact' %}">Ask us directly</a> in the meantime.</p>
+    {% endfor %}
+  </div>
+  <p class="section-cta"><a class="btn btn-primary" href="{% url 'tours:contact' %}">Request a transfer</a></p>
+</div></section>
+{% endblock %}

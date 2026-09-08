@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}About us — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container">
+  <h1>About {{ SITE_NAME }}</h1>
+  <p class="lede">We plan and run safaris, mountain treks, beach holidays and cultural journeys across Tanzania.</p>
+</div></section>
+
+<section class="section"><div class="container narrow prose">
+  <p>We're a Tanzanian tour operator{% if SITE_LOCATION %} based in {{ SITE_LOCATION }}{% endif %}. We handle the whole trip — park fees and permits, vehicles and drivers, guides, accommodation and transfers — so you deal with one team from the first email to the airport drop-off.</p>
+  <p>Our tours cover the northern circuit, the southern parks, the mountains, the coast and Zanzibar. If nothing on the site is quite right, tell us your dates and budget and we'll put together something that is.</p>
+</div></section>
+
+{% if team %}
+<section class="section section-alt"><div class="container">
+  <div class="section-head"><h2>The team</h2></div>
+  <div class="team-grid">
+    {% for m in team %}
+      <div class="team-card">
+        {% if m.photo %}<img src="{{ m.photo.url }}" alt="{{ m.name }}" loading="lazy">{% endif %}
+        <h3>{{ m.name }}</h3>
+        {% if m.role %}<p class="team-role">{{ m.role }}</p>{% endif %}
+        {% if m.bio %}<p>{{ m.bio }}</p>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+<section class="section cta-band"><div class="container">
+  <h2>Ready when you are</h2>
+  <a class="btn btn-primary" href="{% url 'tours:contact' %}">Get in touch</a>
+</div></section>
+{% endblock %}

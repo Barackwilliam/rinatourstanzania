@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}How {{ SITE_NAME }} collects, uses, and protects your personal information when you enquire about or book a Tanzania safari with us.{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding-bottom:50px;">
+  <div class="sun-glow" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Legal</span>
+    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);">Privacy Policy</h1>
+    <p style="color:black" class="hero-lede">Last updated: {% now "F Y" %}</p>
+  </div>
+</section>
+<div class="pattern-band" aria-hidden="true"></div>
+
+<section class="section">
+  <div class="container" style="max-width:820px;">
+    <div style="font-size:1.02rem; color:#5b5044; line-height:1.8;">
+
+      <h2>1. Who We Are</h2>
+      <p>{{ SITE_NAME }} ("we", "us", "our") is a tour operator based at {{ SITE_LOCATION }}. This policy explains what
+      personal information we collect when you use this website or enquire about a safari, and how we use it.</p>
+
+      <h2 class="mt-lg">2. Information We Collect</h2>
+      <p>When you submit our contact or booking enquiry form, we collect the details you provide — typically your
+      name, email address, phone number, the package you're interested in, and your message. If you message us on
+      WhatsApp, we receive whatever information is visible through that platform. We also use standard web analytics
+      that may record your approximate location, device type, and how you use the site.</p>
+
+      <h2 class="mt-lg">3. How We Use Your Information</h2>
+      <p>We use your information to respond to enquiries, prepare quotes and itineraries, process bookings, and
+      communicate with you about your trip. We do not sell your personal information to third parties. We may share
+      necessary booking details with accommodation providers, park authorities, or transport partners strictly to
+      deliver the safari you've booked.</p>
+
+      <h2 class="mt-lg">4. Cookies &amp; Analytics</h2>
+      <p>This site may use cookies and tools such as Google Analytics to understand how visitors use the site and to
+      improve it over time. You can disable cookies in your browser settings; this won't stop you from browsing the
+      site, though some features may work less smoothly.</p>
+
+      <h2 class="mt-lg">5. Data Retention &amp; Security</h2>
+      <p>We keep enquiry and booking information only as long as needed to provide our services and meet legal or
+      accounting requirements, and we take reasonable technical measures to protect it against unauthorized access.</p>
+
+      <h2 class="mt-lg">6. Your Rights</h2>
+      <p>You can ask us at any time what information we hold about you, request a correction, or ask us to delete it,
+      by emailing <a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>.</p>
+
+      <h2 class="mt-lg">7. Contact</h2>
+      <p>Questions about this policy can be sent to <a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a> or
+      {{ SITE_PHONE_PRIMARY }}.</p>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

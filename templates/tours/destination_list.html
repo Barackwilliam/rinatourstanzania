@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Destinations — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container">
+  <h1>Destinations</h1>
+  <p>Parks, mountains, islands and towns we run trips to.</p>
+</div></section>
+<section class="section"><div class="container">
+  <div class="dest-grid dest-grid-lg">
+    {% for d in destinations %}
+      <a class="dest-tile" href="{{ d.get_absolute_url }}">
+        {% if d.get_image %}<img src="{{ d.get_image }}" alt="" loading="lazy">{% endif %}
+        <span class="dest-tile-name">{{ d.name }}</span>
+        <span class="dest-tile-meta">{{ d.get_region_display }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

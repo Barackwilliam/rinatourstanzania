@@ -1,0 +1,196 @@
+from django.conf import settings
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Min, Prefetch, Q
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import ContactForm
+from .data.tanzania_map import OUTLINES, VIEWBOX
+from .models import (
+    Category, Destination, FAQ, HeroSlide, MapRoute, Package, TeamMember,
+    TransferService, Testimonial,
+)
+
+
+def _published():
+    return Package.objects.filter(published=True)
+
+
+def home(request):
+    context = {
+        "slides": HeroSlide.objects.filter(active=True),
+        "categories": Category.objects.filter(featured=True),
+        "featured_packages": _published().filter(featured=True)[:6],
+        "day_trips": _published().filter(duration_days=1)[:6],
+        "destinations": Destination.objects.filter(featured=True)[:8],
+        "transfers": TransferService.objects.filter(active=True),
+        "testimonials": Testimonial.objects.filter(featured=True)[:6],
+        "map_routes": (
+            MapRoute.objects.filter(active=True)
+            .select_related("package")
+            .prefetch_related("stops__destination")
+        ),
+        "map_outlines": OUTLINES,
+        "map_viewbox": VIEWBOX,
+    }
+    return render(request, "tours/home.html", context)
+
+
+def package_list(request):
+    packages = _published().select_related("primary_category")
+
+    category = request.GET.get("category")
+    destination = request.GET.get("destination")
+    query = request.GET.get("q", "").strip()
+    max_days = request.GET.get("max_days")
+
+    if category:
+        packages = packages.filter(categories__slug=category)
+    if destination:
+        packages = packages.filter(destinations__slug=destination)
+    if max_days:
+        try:
+            packages = packages.filter(duration_days__lte=int(max_days))
+        except ValueError:
+            pass
+    if query:
+        packages = packages.filter(
+            Q(title__icontains=query)
+            | Q(short_description__icontains=query)
+            | Q(destinations__name__icontains=query)
+        )
+
+    packages = packages.distinct()
+    page = Paginator(packages, 12).get_page(request.GET.get("page"))
+
+    context = {
+        "packages": page,
+        "page_obj": page,
+        "categories": Category.objects.all(),
+        "destinations": Destination.objects.filter(featured=True),
+        "active_category": category,
+        "active_destination": destination,
+        "query": query,
+        "total": packages.count(),
+    }
+    return render(request, "tours/package_list.html", context)
+
+
+def package_detail(request, slug):
+    package = get_object_or_404(
+        _published().prefetch_related("itinerary_days", "gallery", "destinations",
+                                      "categories"),
+        slug=slug,
+    )
+    related = (
+        _published()
+        .filter(categories__in=package.categories.all())
+        .exclude(pk=package.pk)
+        .distinct()[:3]
+    )
+    return render(request, "tours/package_detail.html",
+                  {"package": package, "related": related})
+
+
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, "tours/category_list.html", {"categories": categories})
+
+
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    packages = _published().filter(categories=category).distinct()
+    page = Paginator(packages, 12).get_page(request.GET.get("page"))
+    return render(request, "tours/category_detail.html", {
+        "category": category,
+        "packages": page,
+        "page_obj": page,
+        "total": packages.count(),
+    })
+
+
+def destination_list(request):
+    destinations = (
+        Destination.objects.all()
+        .annotate(from_price=Min("packages__price_from"))
+    )
+    return render(request, "tours/destination_list.html",
+                  {"destinations": destinations})
+
+
+def destination_detail(request, slug):
+    destination = get_object_or_404(Destination, slug=slug)
+    packages = _published().filter(destinations=destination).distinct()
+    return render(request, "tours/destination_detail.html",
+                  {"destination": destination, "packages": packages})
+
+
+def day_trip_list(request):
+    packages = _published().filter(duration_days=1)
+    return render(request, "tours/day_trip_list.html", {"packages": packages})
+
+
+def transfers(request):
+    return render(request, "tours/transfers.html", {
+        "transfers": TransferService.objects.filter(active=True),
+    })
+
+
+def about(request):
+    return render(request, "tours/about.html", {
+        "team": TeamMember.objects.filter(active=True),
+    })
+
+
+def faq(request):
+    return render(request, "tours/faq.html", {"faqs": FAQ.objects.all()})
+
+
+def reviews(request):
+    return render(request, "tours/reviews.html", {
+        "testimonials": Testimonial.objects.all(),
+    })
+
+
+def contact(request):
+    initial = {}
+    package_slug = request.GET.get("package")
+    package = None
+    if package_slug:
+        package = Package.objects.filter(slug=package_slug).first()
+        if package:
+            initial["package"] = package.pk
+            initial["package_interest"] = package.title
+
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "Thank you — your enquiry has been received. Our team will be in touch shortly.",
+            )
+            return redirect("tours:contact")
+    else:
+        form = ContactForm(initial=initial)
+
+    return render(request, "tours/contact.html", {"form": form, "package": package})
+
+
+def privacy_policy(request):
+    return render(request, "tours/privacy_policy.html")
+
+
+def terms(request):
+    return render(request, "tours/terms.html")
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        f"Sitemap: {settings.SITE_DOMAIN}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}FAQ — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head"><div class="container"><h1>Questions we get asked</h1></div></section>
+<section class="section"><div class="container narrow">
+  {% for f in faqs %}
+    <details class="faq">
+      <summary>{{ f.question }}</summary>
+      <div class="faq-body">{{ f.answer|linebreaks }}</div>
+    </details>
+  {% empty %}
+    <p class="empty">Questions and answers will appear here. <a href="{% url 'tours:contact' %}">Ask us anything</a> in the meantime.</p>
+  {% endfor %}
+</div></section>
+{% endblock %}

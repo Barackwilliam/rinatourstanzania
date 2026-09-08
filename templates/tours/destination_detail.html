@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ destination.name }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <nav class="crumbs"><a href="{% url 'tours:destination_list' %}">Destinations</a></nav>
+    <h1>{{ destination.name }}</h1>
+    <p class="page-head-meta">{{ destination.get_region_display }}</p>
+    {% if destination.description %}<p class="lede">{{ destination.description }}</p>{% endif %}
+  </div>
+</section>
+<section class="section"><div class="container">
+  <div class="section-head"><h2>Tours visiting {{ destination.name }}</h2></div>
+  <div class="tour-grid">
+    {% for package in packages %}
+      {% include "tours/partials/package_card.html" %}
+    {% empty %}
+      <p class="empty">Nothing listed here yet. <a href="{% url 'tours:contact' %}">Ask us about {{ destination.name }}</a>.</p>
+    {% endfor %}
+  </div>
+</div></section>
+{% endblock %}

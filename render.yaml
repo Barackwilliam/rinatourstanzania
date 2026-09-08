@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: rina-tours
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_SSL_REQUIRE
+        value: "True"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      # --- Supabase Storage bucket (images + video) ---
+      - key: SUPABASE_PROJECT_REF
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: "media"
+      - key: SUPABASE_S3_REGION
+        sync: false
+      - key: SUPABASE_S3_ACCESS_KEY_ID
+        sync: false
+      - key: SUPABASE_S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: MAX_IMAGE_UPLOAD_MB
+        value: "8"
+      - key: MAX_VIDEO_UPLOAD_MB
+        value: "45"   # Supabase free tier caps a single file at 50 MB
+      # --- Client branding ---
+      - key: SITE_NAME
+        sync: false
+      - key: SITE_TAGLINE
+        sync: false
+      - key: SITE_PHONE_PRIMARY
+        sync: false
+      - key: SITE_PHONE_SECONDARY
+        sync: false
+      - key: SITE_WHATSAPP
+        sync: false
+      - key: SITE_EMAIL
+        sync: false
+      - key: SITE_LOCATION
+        sync: false
+      - key: SITE_INSTAGRAM
+        sync: false
+      - key: SITE_FACEBOOK
+        sync: false
+      - key: SITE_TIKTOK
+        sync: false
+      - key: SITE_DOMAIN
+        sync: false
+      - key: SITE_MAP_EMBED_URL
+        sync: false
+      - key: GOOGLE_ANALYTICS_ID
+        sync: false
+      - key: GOOGLE_SITE_VERIFICATION
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.12.0"

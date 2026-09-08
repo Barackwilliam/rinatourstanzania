@@ -1,0 +1,76 @@
+{% if map_routes %}
+<section class="section routes" id="routes">
+  <div class="container routes-inner">
+
+    <div class="routes-copy">
+      <h2>Safari, mountain and beach routes in one view</h2>
+      <p>Each line is a journey we run. Follow one from Arusha or Dar es Salaam
+         out to the parks, the peaks or the coast — then open it to see the days,
+         the price and what's included.</p>
+
+      <ul class="routes-legend">
+        {% for route in map_routes %}
+          <li>
+            <button type="button" class="route-key" data-route="{{ route.slug }}"
+                    aria-pressed="false">
+              <span class="route-swatch" style="background:{{ route.colour }}"></span>
+              <span class="route-key-text">
+                <span class="route-key-name">{{ route.name }}</span>
+                {% if route.summary %}<span class="route-key-sub">{{ route.summary }}</span>{% endif %}
+              </span>
+            </button>
+            {% if route.package %}
+              <a class="route-key-link" href="{{ route.package.get_absolute_url }}">
+                {{ route.package.price_display }}
+              </a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <figure class="routes-figure">
+      <svg class="routes-map" viewBox="{{ map_viewbox }}" role="img"
+           aria-labelledby="routes-map-title routes-map-desc">
+        <title id="routes-map-title">Map of Tanzania showing {{ map_routes|length }} tour routes</title>
+        <desc id="routes-map-desc">
+          Outline of Tanzania with the mainland, Unguja, Pemba and Mafia. Coloured
+          lines join the destinations on each route; the same information is in the
+          list beside the map.
+        </desc>
+
+        <g class="map-land">
+          {% for d in map_outlines %}<path d="{{ d }}"/>{% endfor %}
+        </g>
+
+        <g class="map-routes">
+          {% for route in map_routes %}
+            {% if route.path_d %}
+              <path class="map-route" data-route="{{ route.slug }}"
+                    d="{{ route.path_d }}"
+                    stroke="{{ route.colour }}"
+                    style="--len:{{ route.path_length }};
+                           --delay:{{ forloop.counter0 }}50ms"/>
+            {% endif %}
+          {% endfor %}
+        </g>
+
+        <g class="map-stops">
+          {% for route in map_routes %}
+            {% for destination, point in route.marker_points %}
+              <circle class="map-stop" data-route="{{ route.slug }}"
+                      cx="{{ point.0 }}" cy="{{ point.1 }}" r="4"
+                      fill="{{ route.colour }}"
+                      style="--delay:{{ forloop.parentloop.counter0 }}00ms">
+                <title>{{ destination.name }} — {{ route.name }}</title>
+              </circle>
+            {% endfor %}
+          {% endfor %}
+        </g>
+      </svg>
+      <figcaption>Routes are indicative. Every trip is adjusted to your dates, pace and budget.</figcaption>
+    </figure>
+
+  </div>
+</section>
+{% endif %}

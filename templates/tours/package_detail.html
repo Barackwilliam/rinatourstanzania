@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}{{ package.title }} — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ package.short_description|truncatewords:28 }}{% endblock %}
+{% block og_title %}{{ package.title }}{% endblock %}
+{% block content %}
+
+<article class="package">
+
+<section class="package-hero">
+  {% if package.get_image %}<img class="package-hero-media" src="{{ package.get_image }}" alt="{{ package.title }}">{% endif %}
+  <div class="package-hero-overlay"></div>
+  <div class="container package-hero-copy">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="{% url 'tours:package_list' %}">Tours</a>
+      <a href="{{ package.primary_category.get_absolute_url }}">{{ package.primary_category.name }}</a>
+    </nav>
+    <h1>{{ package.title }}</h1>
+    <ul class="package-facts">
+      {% if package.duration_display %}<li>{{ package.duration_display }}</li>{% endif %}
+      {% if package.starting_point %}<li>From {{ package.starting_point }}</li>{% endif %}
+      {% if package.route %}<li>{{ package.route }}</li>{% endif %}
+      <li class="package-facts-price">{{ package.price_display }}</li>
+    </ul>
+  </div>
+</section>
+
+<div class="container package-layout">
+  <div class="package-main">
+
+    {% if package.short_description %}<p class="lede">{{ package.short_description }}</p>{% endif %}
+    {% if package.description %}<div class="prose">{{ package.description|linebreaks }}</div>{% endif %}
+
+    {% if package.itinerary_days.all %}
+    <section class="package-block">
+      <h2>Day by day</h2>
+      <ol class="itinerary">
+        {% for day in package.itinerary_days.all %}
+          <li>
+            <span class="itinerary-day">Day {{ day.day_number }}</span>
+            <div>
+              <h3>{{ day.title }}</h3>
+              {% if day.description and day.description != day.title %}<p>{{ day.description }}</p>{% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if package.highlight_list %}
+    <section class="package-block">
+      <h2>Highlights</h2>
+      <ul class="tick-list">
+        {% for h in package.highlight_list %}<li>{{ h }}</li>{% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if package.include_list or package.exclude_list %}
+    <section class="package-block inc-exc">
+      {% if package.include_list %}
+        <div>
+          <h2>What's included</h2>
+          <ul class="tick-list">{% for i in package.include_list %}<li>{{ i }}</li>{% endfor %}</ul>
+        </div>
+      {% endif %}
+      {% if package.exclude_list %}
+        <div>
+          <h2>Not included</h2>
+          <ul class="cross-list">{% for i in package.exclude_list %}<li>{{ i }}</li>{% endfor %}</ul>
+        </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if package.gallery.all %}
+    <section class="package-block">
+      <h2>Gallery</h2>
+      <div class="gallery">
+        {% for shot in package.gallery.all %}
+          <figure><img src="{{ shot.image.url }}" alt="{{ shot.caption }}" loading="lazy">
+          {% if shot.caption %}<figcaption>{{ shot.caption }}</figcaption>{% endif %}</figure>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if package.best_for %}
+    <section class="package-block">
+      <h2>Who this suits</h2>
+      <p>{{ package.best_for }}</p>
+    </section>
+    {% endif %}
+
+    {% if package.important_note %}
+    <aside class="notice">
+      <h2>Good to know</h2>
+      <p>{{ package.important_note }}</p>
+    </aside>
+    {% endif %}
+  </div>
+
+  <aside class="package-side">
+    <div class="booking-card">
+      <p class="booking-price">{{ package.price_display }}</p>
+      <dl class="booking-facts">
+        {% if package.duration_display %}<div><dt>Duration</dt><dd>{{ package.duration_display }}</dd></div>{% endif %}
+        {% if package.starting_point %}<div><dt>Starts</dt><dd>{{ package.starting_point }}</dd></div>{% endif %}
+        {% if package.destinations.all %}
+          <div><dt>Visits</dt><dd>{% for d in package.destinations.all %}<a href="{{ d.get_absolute_url }}">{{ d.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd></div>
+        {% endif %}
+      </dl>
+      <a class="btn btn-primary btn-block" href="{% url 'tours:contact' %}?package={{ package.slug }}">Enquire about this tour</a>
+      {% if SITE_WHATSAPP %}
+        <a class="btn btn-ghost btn-block" href="https://wa.me/{{ SITE_WHATSAPP }}?text=Hello, I'd like to ask about {{ package.title|urlencode }}" rel="noopener" target="_blank">Ask on WhatsApp</a>
+      {% endif %}
+      <p class="booking-note">Prices are a starting point and change with group size, season and accommodation.</p>
+    </div>
+  </aside>
+</div>
+
+{% if related %}
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-head"><h2>You might also like</h2></div>
+    <div class="tour-grid">
+      {% for package in related %}{% include "tours/partials/package_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+</article>
+{% endblock %}

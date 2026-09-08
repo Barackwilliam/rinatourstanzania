@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Terms &amp; Conditions — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}Booking terms, payment, cancellation, and liability conditions for safaris, treks, and holidays booked with {{ SITE_NAME }}.{% endblock %}
+{% block content %}
+
+<section class="hero" style="padding-bottom:50px;">
+  <div class="sun-glow" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Legal</span>
+    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);">Terms &amp; Conditions</h1>
+    <p style="color:black" class="hero-lede">Last updated: {% now "F Y" %}</p>
+  </div>
+</section>
+<div class="pattern-band" aria-hidden="true"></div>
+
+<section class="section">
+  <div class="container" style="max-width:820px;">
+    <div style="font-size:1.02rem; color:#5b5044; line-height:1.8;">
+
+      <h2>1. Bookings &amp; Confirmation</h2>
+      <p>A booking is confirmed once we receive your written agreement to the itinerary and price, together with the
+      required deposit. Full payment is due before the start of your trip, on the schedule confirmed at the time of
+      booking.</p>
+
+      <h2 class="mt-lg">2. Pricing</h2>
+      <p>Package prices shown on this site are indicative, starting "from" prices in US Dollars, and depend on group
+      size, season, and accommodation choice. We will always confirm the exact price in writing before you pay a
+      deposit.</p>
+
+      <h2 class="mt-lg">3. Cancellations &amp; Changes</h2>
+      <p>Cancellations must be made in writing. Deposits are generally non-refundable, as they cover park fees,
+      accommodation holds, and guide/vehicle reservations made on your behalf. Cancellation charges closer to the
+      travel date may be higher and will be confirmed at booking. Date changes are subject to availability.</p>
+
+      <h2 class="mt-lg">4. Travel Documents &amp; Health</h2>
+      <p>Travelers are responsible for holding a valid passport, any required Tanzania visa, and any recommended
+      vaccinations (such as yellow fever, where applicable). We recommend travel insurance covering medical
+      evacuation for all safaris and treks.</p>
+
+      <h2 class="mt-lg">5. Liability</h2>
+      <p>{{ SITE_NAME }} arranges transport, guiding, accommodation, and park entry with reputable local partners. We
+      are not liable for delays, losses, or injury caused by circumstances beyond our reasonable control, including
+      weather, wildlife behaviour, road conditions, or third-party service providers.</p>
+
+      <h2 class="mt-lg">6. Conduct on Safari &amp; Trek</h2>
+      <p>Guests agree to follow the safety instructions of their guide at all times, including park rules around
+      wildlife distance and behaviour on Mount Kilimanjaro. {{ SITE_NAME }} reserves the right to end a trip early,
+      without refund, for guests whose conduct endangers themselves, other guests, staff, or wildlife.</p>
+
+      <h2 class="mt-lg">7. Governing Law</h2>
+      <p>These terms are governed by the laws of the United Republic of Tanzania.</p>
+
+      <h2 class="mt-lg">8. Contact</h2>
+      <p>Questions about these terms can be sent to <a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a> or
+      {{ SITE_PHONE_PRIMARY }}.</p>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

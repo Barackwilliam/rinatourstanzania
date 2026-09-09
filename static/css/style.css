@@ -1024,3 +1024,60 @@ h3 { font-size: 1.18rem; }
   .service-card:hover { transform: none; }
   .tour-card:hover .tour-card-media img { transform: none; }
 }
+
+/* ------------------------------------------------------------- credit --- */
+/* The agency line. It sits in the footer's quietest row and stays quiet until
+   the pointer reaches it — a signature, not a second logo. */
+.credit {
+  display: inline-flex; align-items: baseline; gap: 7px;
+  font-size: .82rem; margin-left: auto; white-space: nowrap;
+}
+.credit-label { opacity: .6; }
+
+.credit-link {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 5px;
+  text-decoration: none; color: var(--gold-pale);
+  padding-bottom: 2px;
+}
+.credit-name {
+  font-family: var(--font-display);
+  font-size: .95rem; letter-spacing: .015em;
+  color: #E3C489;
+}
+/* The gradient is applied only where clipping text is actually supported.
+   Without the guard, a browser that ignores background-clip would paint a gold
+   rectangle over transparent text and the name would vanish. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .credit-name {
+    background: linear-gradient(100deg, var(--gold-pale) 0%, var(--gold) 45%, #E8C98A 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+}
+/* A hairline that draws itself in from the left on hover. */
+.credit-link::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, var(--gold), rgba(232,201,138,.35));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .35s cubic-bezier(.22,.68,0,1);
+}
+.credit-link:hover::after,
+.credit-link:focus-visible::after { transform: scaleX(1); }
+
+.credit-arrow {
+  color: var(--gold);
+  opacity: 0; transform: translate(-3px, 3px);
+  transition: opacity .25s ease, transform .3s cubic-bezier(.22,.68,0,1);
+}
+.credit-link:hover .credit-arrow,
+.credit-link:focus-visible .credit-arrow { opacity: 1; transform: none; }
+
+@media (max-width: 760px) {
+  .credit { margin-left: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .credit-link::after { transform: scaleX(1); }
+  .credit-arrow { opacity: 1; transform: none; transition: none; }
+}

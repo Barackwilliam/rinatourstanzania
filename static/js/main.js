@@ -396,6 +396,33 @@
     });
   }
 
+  /* --- Climb route map --------------------------------------------------
+     The route is drawn in full in the stylesheet. Here we opt into the
+     draw-on animation: add .is-ready to dash the line, then .is-drawing on
+     the next frame to animate it in. Doing it in that order means a visitor
+     whose script never runs simply sees the finished line rather than
+     nothing at all. */
+  var climbMap = document.querySelector('.climb-map-section');
+  if (climbMap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    function drawClimbMap() {
+      climbMap.classList.add('is-ready');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { climbMap.classList.add('is-drawing'); });
+      });
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          drawClimbMap();
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.25 }).observe(climbMap);
+    } else {
+      drawClimbMap();
+    }
+  }
+
   /* --- Climb profile ----------------------------------------------------
      Draws itself once on scroll, and keeps the chart tied to the camp list:
      touching either half marks the same camp in the other. On a phone the two

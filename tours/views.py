@@ -150,14 +150,27 @@ def _kilimanjaro_map_context():
     do arithmetic, and rather than in the model because none of it depends on
     which route is being drawn — it is the same mountain every time.
     """
+    contours = []
+    for i, c in enumerate(kili.CONTOURS):
+        ring = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*c)))
+        # Opacity is computed here and written onto the element as a plain
+        # attribute. It used to be a CSS `calc()` over a custom property, and
+        # where that failed to parse the opacity fell back to 1 — so all seven
+        # rings painted at full strength on top of each other and the map came
+        # out as a solid black blob. A number in the markup cannot fail that way.
+        ring["opacity"] = round(0.045 + i * 0.022, 3)
+        contours.append(ring)
+
+    mawenzi = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.MAWENZI)))
+    mawenzi["opacity"] = 0.10
+    shira = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.SHIRA_PLATEAU)))
+    shira["opacity"] = 0.10
+
     return {
         "map_viewbox": kili.VIEWBOX,
-        "map_contours": [
-            dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*c)))
-            for c in kili.CONTOURS
-        ],
-        "map_mawenzi": dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.MAWENZI))),
-        "map_shira": dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.SHIRA_PLATEAU))),
+        "map_contours": contours,
+        "map_mawenzi": mawenzi,
+        "map_shira": shira,
         "map_landmarks": [
             {"name": name, "x": kili.project(lon, lat)[0], "y": kili.project(lon, lat)[1]}
             for name, lon, lat in kili.LANDMARKS

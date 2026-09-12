@@ -28,12 +28,15 @@
       <g class="climb-map-relief">
         {% for c in map_contours %}
           <ellipse cx="{{ c.cx }}" cy="{{ c.cy }}" rx="{{ c.rx }}" ry="{{ c.ry }}"
-                   style="--ring:{{ forloop.counter0 }}"/>
+                   fill="#2E1B12" fill-opacity="{{ c.opacity }}"
+                   stroke="#2E1B12" stroke-opacity="0.10" stroke-width="1"/>
         {% endfor %}
-        <ellipse class="climb-map-mawenzi" cx="{{ map_mawenzi.cx }}" cy="{{ map_mawenzi.cy }}"
-                 rx="{{ map_mawenzi.rx }}" ry="{{ map_mawenzi.ry }}"/>
-        <ellipse class="climb-map-shira" cx="{{ map_shira.cx }}" cy="{{ map_shira.cy }}"
-                 rx="{{ map_shira.rx }}" ry="{{ map_shira.ry }}"/>
+        <ellipse cx="{{ map_mawenzi.cx }}" cy="{{ map_mawenzi.cy }}"
+                 rx="{{ map_mawenzi.rx }}" ry="{{ map_mawenzi.ry }}"
+                 fill="#2E1B12" fill-opacity="{{ map_mawenzi.opacity }}"/>
+        <ellipse cx="{{ map_shira.cx }}" cy="{{ map_shira.cy }}"
+                 rx="{{ map_shira.rx }}" ry="{{ map_shira.ry }}"
+                 fill="#2E1B12" fill-opacity="{{ map_shira.opacity }}"/>
       </g>
 
       <g class="climb-map-labels">

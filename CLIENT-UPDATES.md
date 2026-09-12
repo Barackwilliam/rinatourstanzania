@@ -273,3 +273,55 @@ admin kisha run tena.
 
 Picha ni **pikipiki**, maelezo ya package yanasema **baiskeli za mlimani**.
 Usiichapishe mpaka client ajibu. Soma `PHOTO-NOTES.md` kwenye zip ya picha.
+
+---
+
+## 8. Sahihisho: map ya mlima ilikuwa doa jeusi kwenye simu
+
+Bugs mbili, zote za aina moja — kitu muhimu kilitegemea kitu kinachoweza
+kushindikana.
+
+### Bug 1: pete zote zilichorwa kwa opacity 1
+
+CSS ilikuwa:
+
+```css
+opacity: calc(0.045 + var(--ring, 0) * 0.022);
+```
+
+Browser isipoisoma `calc()` yenye custom property, opacity inarudi `1`. Pete
+saba za rangi `#2E1B12` zikijipanga juu ya nyingine kwa opacity kamili =
+**weusi mtupu**.
+
+Sasa opacity inahesabiwa Python kwenye view na kuandikwa kama attribute ya
+SVG (`fill-opacity="0.089"`). Namba iliyo ndani ya markup haiwezi kushindwa
+kusomeka.
+
+### Bug 2: mstari wa njia haukuonekana kabisa
+
+`.climb-map-route` ilikuwa na `stroke-dashoffset` kamili, ikisubiri class
+`is-drawing`. Lakini **hakuna kitu kilichokuwa kinaiongeza kwenye section
+hii** — `main.js` inaiongeza kwenye `.routes-map` na `.climb-figure` tu.
+
+Kwa hiyo mstari ulikuwa hauonekani kwenye kila ukurasa wa kupanda mlima, si
+kwenye simu tu.
+
+Sasa mstari unachorwa **kikamilifu kwa default**. JS inaongeza `is-ready`
+kisha `is-drawing` ili kuanzisha animation. Script ikishindwa kufanya kazi,
+unapoteza animation — si mchoro.
+
+### Kanuni
+
+Nilichojifunza hapa: kitu chenye maana kisiwe kwenye CSS inayoweza
+kushindikana wala kisisubiri JS. Rangi na nafasi za mchoro sasa ziko kwenye
+markup; CSS ina mapambo tu.
+
+Nilikuwa nimeona doa jeusi hili kwenye render yangu mapema nikadhani ni
+tatizo la tool ya kurender. Lilikuwa ni bug halisi.
+
+Faili: `tours/views.py`, `templates/tours/partials/climb_map.html`,
+`static/css/style.css`, `static/js/main.js`. Baada ya copy:
+
+```
+python manage.py collectstatic --no-input
+```

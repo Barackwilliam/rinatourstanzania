@@ -1376,16 +1376,12 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 }
 .climb-map { width: 100%; height: auto; display: block; }
 
-.climb-map-relief ellipse {
-  fill: #2E1B12;
-  /* Each ring a little more opaque than the last, so the cone reads as
-     rising ground rather than as a target. */
-  opacity: calc(0.045 + var(--ring, 0) * 0.022);
-  stroke: #2E1B12;
-  stroke-opacity: .10;
-  stroke-width: 1;
-}
-.climb-map-mawenzi, .climb-map-shira { opacity: .10 !important; }
+/* Relief fill and opacity are written onto each ellipse as SVG attributes by
+   the view, not set here. They were a CSS calc() over a custom property, and
+   in a browser that did not parse it the opacity fell back to 1 — seven rings
+   of near-black stacked on each other, and the map rendered as a solid blob.
+   Anything that must be visible for the drawing to make sense now lives in
+   the markup; only decoration lives in this file. */
 
 .climb-map-labels text {
   font-size: 13px;
@@ -1395,16 +1391,26 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   text-transform: uppercase;
 }
 
+/* The route is drawn in full by default. The draw-on animation is added only
+   once the section is in view, by JavaScript.
+
+   It used to be the other way round — the line shipped fully dash-offset and
+   waited for an .is-drawing class. Nothing ever added that class to this
+   section, only to the altitude profile below it, so the route was invisible
+   on every climb page. Making the visible state the default means a missing
+   class, a failed script or an old browser costs the animation, never the
+   drawing itself. */
 .climb-map-route {
   fill: none;
   stroke: var(--copper, #C2662B);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+.climb-map-section.is-ready .climb-map-route {
   stroke-dasharray: var(--len, 1000);
   stroke-dashoffset: var(--len, 1000);
 }
-.climb-figure.is-drawing .climb-map-route,
 .climb-map-section.is-drawing .climb-map-route {
   animation: climb-map-draw 1.8s ease-out forwards;
 }
@@ -1449,9 +1455,19 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   display: flex; align-items: center; gap: .45rem; flex-wrap: wrap;
   margin-top: .7rem; font-size: .85rem; color: #6B5642;
 }
-.climb-map-key span { display: inline-block; width: 26px; height: 0; margin-right: .2rem; }
-.climb-map-key-up { border-top: 3px solid var(--copper, #C2662B); }
-.climb-map-key-down { border-top: 2px dashed var(--copper, #C2662B); opacity: .6; margin-left: .8rem; }
+.climb-map-key span {
+  display: inline-block;
+  width: 26px;
+  margin-right: .3rem;
+  vertical-align: middle;
+}
+/* Real height and a background rather than a border on a zero-height box:
+   the swatches were invisible on the phone. */
+.climb-map-key-up { height: 3px; background: var(--copper, #C2662B); border-radius: 2px; }
+.climb-map-key-down {
+  height: 0; border-top: 2px dashed var(--copper, #C2662B);
+  opacity: .65; margin-left: .9rem;
+}
 
 /* --- Contact details in the homepage CTA band --------------------------- */
 .cta-contacts {

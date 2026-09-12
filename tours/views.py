@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Min, Prefetch, Q
+from django.db.models import Count, Min, Prefetch, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -9,7 +9,7 @@ from .forms import ContactForm
 from .data.tanzania_map import OUTLINES, VIEWBOX
 from .models import (
     Accommodation, Category, Destination, FAQ, HeroSlide, MapRoute, Package,
-    TeamMember, TransferService, Testimonial,
+    RouteStop, TeamMember, TransferService, Testimonial,
 )
 
 
@@ -18,18 +18,29 @@ def _published():
 
 
 def home(request):
+    # The tour cards read package.primary_category for the bead colour and the
+    # label, so select_related keeps six cards at one query instead of seven.
+    cards = _published().select_related("primary_category")
+
     context = {
         "slides": HeroSlide.objects.filter(active=True),
-        "categories": Category.objects.filter(featured=True),
-        "featured_packages": _published().filter(featured=True)[:6],
-        "day_trips": _published().filter(duration_days=1)[:6],
+        # annotate rather than calling Category.package_count() in the template:
+        # the tile grid was one COUNT query per category.
+        "categories": (
+            Category.objects.filter(featured=True)
+            .annotate(package_count=Count("packages", distinct=True))
+        ),
+        "featured_packages": cards.filter(featured=True)[:6],
+        "day_trips": cards.filter(duration_days=1)[:6],
         "destinations": Destination.objects.filter(featured=True)[:8],
         "transfers": TransferService.objects.filter(active=True),
         "testimonials": Testimonial.objects.filter(featured=True)[:6],
         "map_routes": (
             MapRoute.objects.filter(active=True)
             .select_related("package")
-            .prefetch_related("stops__destination")
+            .prefetch_related(
+                Prefetch("stops", queryset=RouteStop.objects.select_related("destination"))
+            )
         ),
         "total_packages": _published().count(),
         "map_outlines": OUTLINES,
@@ -73,7 +84,9 @@ def package_list(request):
         "active_category": category,
         "active_destination": destination,
         "query": query,
-        "total": packages.count(),
+        # the paginator has already counted; asking the queryset again was a
+        # second COUNT over the same filtered set.
+        "total": page.paginator.count,
     }
     return render(request, "tours/package_list.html", context)
 
@@ -114,6 +127,7 @@ def package_detail(request, slug):
     )
     related = (
         _published()
+        .select_related("primary_category")
         .filter(categories__in=package.categories.all())
         .exclude(pk=package.pk)
         .distinct()[:3]
@@ -129,13 +143,16 @@ def category_list(request):
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    packages = _published().filter(categories=category).distinct()
+    packages = (
+        _published().filter(categories=category)
+        .select_related("primary_category").distinct()
+    )
     page = Paginator(packages, 12).get_page(request.GET.get("page"))
     return render(request, "tours/category_detail.html", {
         "category": category,
         "packages": page,
         "page_obj": page,
-        "total": packages.count(),
+        "total": page.paginator.count,
     })
 
 
@@ -150,13 +167,16 @@ def destination_list(request):
 
 def destination_detail(request, slug):
     destination = get_object_or_404(Destination, slug=slug)
-    packages = _published().filter(destinations=destination).distinct()
+    packages = (
+        _published().filter(destinations=destination)
+        .select_related("primary_category").distinct()
+    )
     return render(request, "tours/destination_detail.html",
                   {"destination": destination, "packages": packages})
 
 
 def day_trip_list(request):
-    packages = _published().filter(duration_days=1)
+    packages = _published().filter(duration_days=1).select_related("primary_category")
     return render(request, "tours/day_trip_list.html", {"packages": packages})
 
 

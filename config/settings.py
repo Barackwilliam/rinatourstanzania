@@ -46,6 +46,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Compresses the HTML itself. The homepage is 76 KB of markup — the mega
+    # menu and the routes map are both large — and gzip takes that to roughly
+    # 12 KB. Django masks the CSRF token per request, which is what makes
+    # compressing pages that carry one safe here.
+    "django.middleware.gzip.GZipMiddleware",
+    # Answers a repeat visit with 304 Not Modified when nothing changed,
+    # instead of resending the whole page.
+    "django.middleware.http.ConditionalGetMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -115,6 +123,32 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# CompressedManifestStaticFilesStorage fingerprints every filename, so the
+# browser can hold on to CSS and JS indefinitely — a new deploy changes the
+# name, not the cache entry.
+WHITENOISE_MAX_AGE = 31536000
+
+# --- Caching -------------------------------------------------------------------
+# In-process, per worker. That is enough for what it holds (the nav menus, which
+# are identical for every visitor) and it needs no Redis instance to run. Set
+# REDIS_URL if you later put more than one dyno behind this.
+_redis_url = config("REDIS_URL", default="")
+if _redis_url:
+    CACHES = {"default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": _redis_url,
+    }}
+else:
+    CACHES = {"default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "rina-local",
+    }}
+
+# How long the header/footer navigation is held. Admin edits clear it
+# immediately via tours/signals.py, so this is only a backstop. Set to 0 to
+# rebuild it on every request.
+NAV_CACHE_SECONDS = config("NAV_CACHE_SECONDS", default=600, cast=int)
 
 # --- Media: images + video in a Supabase Storage bucket ---------------------------
 # Supabase dashboard:

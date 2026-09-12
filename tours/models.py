@@ -177,6 +177,14 @@ class Package(models.Model):
 
     class Meta:
         ordering = ["order", "duration_days", "title"]
+        indexes = [
+            # Every listing page starts from published=True, and the homepage
+            # and day-trip page narrow it further. Without these Postgres scans
+            # the whole table on each one.
+            models.Index(fields=["published", "featured"], name="pkg_pub_feat_idx"),
+            models.Index(fields=["published", "duration_days"], name="pkg_pub_days_idx"),
+            models.Index(fields=["order", "duration_days", "title"], name="pkg_order_idx"),
+        ]
 
     def __str__(self):
         return self.title
@@ -518,17 +526,36 @@ class MapRoute(models.Model):
     class Meta:
         ordering = ["order", "name"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._points_cache = None
+        self._offset_cache = None
+
     def __str__(self):
         return self.name
 
     def points(self):
-        """Projected SVG points for every stop that has coordinates."""
-        out = []
-        for stop in self.stops.select_related("destination"):
-            point = stop.destination.map_point()
-            if point:
-                out.append((stop.destination, point))
-        return out
+        """
+        Projected SVG points for every stop that has coordinates.
+
+        `stops.all()` rather than `stops.select_related(...)`: the homepage
+        prefetches `stops__destination`, and any queryset method on the related
+        manager throws that prefetched cache away and re-queries. Six routes
+        each asked for their stops three times per template call was 43 of the
+        homepage's 71 queries.
+
+        The result is memoised on the instance too — `path_d`, `path_length`
+        and `marker_points` all want the same list, and `marker_points` is
+        rendered twice (map markers, then the legend).
+        """
+        if self._points_cache is None:
+            out = []
+            for stop in self.stops.all():
+                point = stop.destination.map_point()
+                if point:
+                    out.append((stop.destination, point))
+            self._points_cache = out
+        return self._points_cache
 
     def _offset_points(self):
         """
@@ -537,14 +564,19 @@ class MapRoute(models.Model):
         three of them — and without this the lines sit exactly on top of one
         another and only the last one drawn is visible.
         """
+        if self._offset_cache is not None:
+            return self._offset_cache
+
         pts = [p for _d, p in self.points()]
         if len(pts) < 2:
+            self._offset_cache = pts
             return pts
         # alternate sides, widening slightly for each successive route
         step = (self.order + 1) // 2
         side = 1 if self.order % 2 == 0 else -1
         shift = side * step * 5.0
         if shift == 0:
+            self._offset_cache = pts
             return pts
 
         out = []
@@ -555,6 +587,7 @@ class MapRoute(models.Model):
             dx, dy = bx - ax, by - ay
             length = (dx * dx + dy * dy) ** 0.5 or 1.0
             out.append((x + (-dy / length) * shift, y + (dx / length) * shift))
+        self._offset_cache = out
         return out
 
     def path_d(self):

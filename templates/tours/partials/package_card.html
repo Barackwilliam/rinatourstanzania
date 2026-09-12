@@ -1,7 +1,8 @@
 <article class="tour-card" style="--card-bead:{{ package.primary_category.bead_colour }}">
   <a class="tour-card-media" href="{{ package.get_absolute_url }}">
     {% if package.get_image %}
-      <img src="{{ package.get_image }}" alt="{{ package.title }}" loading="lazy">
+      <img src="{{ package.get_image }}" alt="{{ package.title }}"
+           width="600" height="400" loading="lazy" decoding="async">
     {% else %}
       <span class="tour-card-placeholder" aria-hidden="true"></span>
     {% endif %}

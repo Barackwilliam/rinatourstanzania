@@ -301,6 +301,20 @@ h3 { font-size: 1.18rem; }
 .hero-slide.is-active .hero-media {
   animation: hero-drift 16s ease-out forwards;
 }
+
+/* Where a slide has a video, the poster is a real <img> stacked on top of it
+   rather than the <video poster> attribute. A poster attribute only paints
+   once the element has decided it has no frames, which on a slow connection is
+   a beat of empty box; an image painted normally is there at first paint. The
+   video is revealed underneath only when it can play through, so a clip that
+   never arrives costs nothing and a clip that does arrive never flashes. */
+.hero-media-poster {
+  position: absolute; inset: 0;
+  transition: opacity .6s ease;
+}
+.hero-media-poster.is-hidden { opacity: 0; pointer-events: none; }
+video.hero-media:not(.is-ready) { opacity: 0; }
+video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 @keyframes hero-drift {
   from { transform: scale(1.06) translate3d(0, 0, 0); }
   to   { transform: scale(1.14) translate3d(-1.4%, -1.2%, 0); }

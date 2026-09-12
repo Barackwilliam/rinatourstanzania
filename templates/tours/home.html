@@ -7,13 +7,25 @@
       <div class="hero-slide{% if forloop.first %} is-active{% endif %}" data-slide="{{ forloop.counter0 }}">
         <div class="hero-media-wrap">
           {% if slide.video %}
-            <video class="hero-media" autoplay muted loop playsinline
-                   {% if slide.image %}poster="{{ slide.image.url }}"{% endif %}>
-              <source src="{{ slide.video.url }}" type="video/mp4">
-            </video>
+            {# The poster shows immediately; the clip itself is fetched by
+               main.js after the page has loaded, and only on a connection that
+               can carry it. Previously `autoplay` with no `preload` hint meant
+               the browser pulled the whole file down before the visitor saw
+               anything — on the hero video currently attached, eighteen
+               megabytes of it. `preload="none"` and no `src` attribute are
+               what actually stop that; `data-src` is picked up later. #}
+            <video class="hero-media" muted loop playsinline preload="none"
+                   data-hero-video="{{ slide.video.url }}"
+                   {% if slide.image %}poster="{{ slide.image.url }}"{% endif %}></video>
+            {% if slide.image %}
+              <img class="hero-media hero-media-poster" src="{{ slide.image.url }}" alt=""
+                   {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                   decoding="async">
+            {% endif %}
           {% elif slide.image %}
             <img class="hero-media" src="{{ slide.image.url }}" alt=""
-                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                 decoding="async">
           {% else %}
             <div class="hero-media hero-media-blank" data-tone="{{ forloop.counter0 }}"></div>
           {% endif %}
@@ -97,7 +109,7 @@
     <div class="category-grid">
       {% for c in categories %}
         <a class="category-tile" href="{{ c.get_absolute_url }}" style="--tile-bead:{{ c.bead_colour }}">
-          {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy">{% endif %}
+          {% if c.image %}<img src="{{ c.image.url }}" alt="" width="400" height="300" loading="lazy" decoding="async">{% endif %}
           <span class="category-tile-body">
             <span class="category-tile-name">{{ c.name }}</span>
             <span class="category-tile-count">{{ c.package_count }} tours</span>
@@ -153,7 +165,7 @@
     <div class="dest-grid">
       {% for d in destinations %}
         <a class="dest-tile" href="{{ d.get_absolute_url }}">
-          {% if d.get_image %}<img src="{{ d.get_image }}" alt="" loading="lazy">{% endif %}
+          {% if d.get_image %}<img src="{{ d.get_image }}" alt="" width="400" height="300" loading="lazy" decoding="async">{% endif %}
           <span class="dest-tile-name">{{ d.name }}</span>
         </a>
       {% endfor %}

@@ -17,12 +17,22 @@
 
 {% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+{# Our own CSS first and blocking — it is what the page needs to lay out.
+   Google Fonts follows, but non-blocking: the media="print" trick lets the
+   browser fetch it without holding up first paint, then flips it to all once
+   it lands. display=swap means text is readable in the fallback face in the
+   meantime instead of invisible. On a slow connection this was two extra
+   round trips to a third-party host before anything appeared. #}
 <link rel="stylesheet" href="{% static 'css/motifs.css' %}">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+</noscript>
 
 <script type="application/ld+json">
 {
@@ -158,7 +168,7 @@
               {% if nav_promoted %}
               <a class="mega-promo" href="{{ nav_promoted.get_absolute_url }}">
                 <span class="mega-promo-media">
-                  {% if nav_promoted.get_image %}<img src="{{ nav_promoted.get_image }}" alt="" loading="lazy">{% endif %}
+                  {% if nav_promoted.get_image %}<img src="{{ nav_promoted.get_image }}" alt="" width="320" height="200" loading="lazy" decoding="async">{% endif %}
                 </span>
                 <span class="mega-promo-body">
                   <span class="mega-promo-label">Most booked</span>
@@ -308,7 +318,9 @@
   </div>
 </footer>
 
-<script src="{% static 'js/main.js' %}"></script>
+{# defer: the browser can keep building the page while this downloads, and it
+   runs once the DOM is there. Nothing in main.js needs to run earlier. #}
+<script defer src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

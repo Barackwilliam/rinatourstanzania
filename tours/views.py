@@ -35,6 +35,9 @@ def home(request):
         "day_trips": cards.filter(duration_days=1)[:6],
         "destinations": Destination.objects.filter(featured=True)[:8],
         "transfers": TransferService.objects.filter(active=True),
+        # The guest house is one of the things the client most wanted visible,
+        # and it was reachable only from the top nav.
+        "stay": Accommodation.objects.filter(active=True).first(),
         "testimonials": Testimonial.objects.filter(featured=True)[:6],
         "map_routes": (
             MapRoute.objects.filter(active=True)

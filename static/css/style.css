@@ -1452,3 +1452,69 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 .climb-map-key span { display: inline-block; width: 26px; height: 0; margin-right: .2rem; }
 .climb-map-key-up { border-top: 3px solid var(--copper, #C2662B); }
 .climb-map-key-down { border-top: 2px dashed var(--copper, #C2662B); opacity: .6; margin-left: .8rem; }
+
+/* --- Contact details in the homepage CTA band --------------------------- */
+.cta-contacts {
+  list-style: none;
+  margin: 1.6rem 0 1.8rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.1rem 2.4rem;
+}
+.cta-contacts li { display: flex; flex-direction: column; gap: .15rem; }
+.cta-contact-label {
+  font-size: .72rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .62;
+}
+.cta-contacts a {
+  font-size: 1.06rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+.cta-contacts a:hover { opacity: .75; }
+
+/* --- Guest house band on the homepage ----------------------------------- */
+.stay-band {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 2.6rem;
+  align-items: center;
+}
+.stay-band-copy h2 { margin-bottom: .7rem; }
+.stay-band-facts {
+  list-style: none;
+  margin: 1.1rem 0 1.5rem;
+  padding: 0;
+  display: grid;
+  gap: .55rem;
+}
+.stay-band-facts li {
+  position: relative;
+  padding-left: 1.15rem;
+  line-height: 1.45;
+}
+.stay-band-facts li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: .58em;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--copper, #C2662B);
+}
+.stay-band-image {
+  width: 100%; height: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+@media (max-width: 860px) {
+  .stay-band { grid-template-columns: 1fr; gap: 1.6rem; }
+  .stay-band-image { max-height: 260px; }
+  .cta-contacts { gap: 1rem 1.6rem; }
+}

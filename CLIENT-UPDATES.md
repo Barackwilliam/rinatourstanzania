@@ -132,3 +132,144 @@ Run tena:
 ```bash
 python manage.py seed_client_requests
 ```
+
+---
+
+## 5. Bei ya kupanda Kilimanjaro
+
+```bash
+python manage.py set_climb_price                # dry run — inaonyesha tu
+python manage.py set_climb_price --apply        # inapandisha zilizo chini ya $1746
+python manage.py set_climb_price --apply --flat # inaweka ZOTE $1746
+```
+
+Dry run ndio default kwa makusudi — hii inahariri bei za live kwa wingi.
+
+Bei za sasa ni $1,500 hadi $2,200 kwa siku 6 hadi 9. Mode mbili kwa sababu
+"bei ianze $1746" na "kila kupanda ni $1746" ni maagizo tofauti:
+
+- **Floor (default)** — zilizo chini ya $1746 zinapanda, zilizo juu zinabaki.
+  Marangu, Machame na Umbwe zinapanda; Lemosho, Rongai, 8-day na Northern
+  Circuit zinabaki. Bei ya chini kabisa inakuwa $1746, ndiyo maana ya "from"
+- **`--flat`** — zote zinakuwa $1746, ikiwemo **kushusha** Northern Circuit ya
+  siku 9 kutoka $2,200 na Lemosho ya siku 8 kutoka $2,000
+
+Command inaonya wazi kabla ya kushusha bei yoyote. Siku 9 ina park fees zaidi,
+crew days zaidi na chakula zaidi kuliko siku 6 — kuiuza kwa bei ya siku 6 ni
+hasara kwa kila mteja anayeinunua.
+
+Kubadilisha kiasi: `--price 1850`. Kwa Meru: `--mountain "Mount Meru"`.
+
+Haiguswi day hikes za foothills — zina "Kilimanjaro" kwenye title lakini si
+kupanda mlima. Kama ningelinganisha kwa title, matembezi ya $80 yangekuwa
+$1,746.
+
+### Kurudisha bei baada ya `--flat`
+
+`--flat` inaweka **zote** $1746, ikiwemo kushusha ndefu. Kurudisha:
+
+```bash
+python manage.py restore_climb_prices          # dry run
+python manage.py restore_climb_prices --apply  # rudisha bei za zamani
+python manage.py set_climb_price --apply       # kisha weka $1746 kama floor
+```
+
+Matokeo: Marangu, Machame na Umbwe zinakuwa $1,746. Rongai na Machame-7
+zinabaki $1,750, Lemosho $1,800, Lemosho-8 $2,000, Northern Circuit $2,200.
+Bei ya chini kabisa ni $1,746 — ndiyo "from $1746".
+
+Bei za zamani zimehifadhiwa ndani ya command hiyo.
+
+---
+
+## 6. Sahihisho mbili za `import_photos`
+
+### Bug: `'str' object has no attribute 'save'`
+
+Command ilikuwa inafanya `owner.image.save(...)`. Lakini `Package` na
+`Destination` zina **field mbili**: `image` (URLField — kwa picha iliyo host
+mahali pengine) na `image_upload` (ImageField — faili halisi). `hasattr(owner,
+"image")` ilikuwa kweli kwa zote, kwa hiyo command ilishika URLField na
+kuita `.save()` juu ya string.
+
+Ndiyo maana `stay` ilifanya kazi lakini `package` zote zilianguka —
+`Accommodation` ina ImageField tu.
+
+Sasa inaangalia **aina ya field**, si jina lake. Itafanya kazi hata kwa model
+zitakazoongezwa baadaye.
+
+### Command mpya: `find_package`
+
+```
+python manage.py find_package materuni
+python manage.py find_package coffee --day-trips
+python manage.py find_package --unpublished
+```
+
+Inaonyesha slug, siku, bei na kama imechapishwa.
+
+Slugs zinatengenezwa na `import_packages` kutoka kwenye titles, kwa hiyo
+zinatofautiana kati ya import moja na nyingine na kati ya database moja na
+nyingine. Nimekuwa nikizichukua kutoka DB yangu na kukupa — ndiyo maana
+ulipata "No package with slug". Tumia command hii badala ya kunukuu slug
+kutoka kwenye document.
+
+---
+
+## 7. Homepage: accommodation, contact, na tours za leo
+
+### Weka hizi kwenye `.env` — bila hizo hakuna namba popote
+
+**Hili ndilo tatizo kubwa nililolikuta:** `.env` yako ina `SITE_EMAIL=`,
+`SITE_WHATSAPP=`, `SITE_PHONE_PRIMARY=` **tupu**. Templates zote — header,
+footer, contact page, kitufe cha WhatsApp, hata schema.org ya Google — tayari
+zinasoma settings hizo. Zilikuwa hazionyeshi chochote kwa sababu hazina data,
+si kwa sababu hazipo.
+
+```
+SITE_PHONE_PRIMARY=+255 681 965 636
+SITE_WHATSAPP=255767753553
+SITE_WHATSAPP_DISPLAY=0767 753 553
+SITE_EMAIL=info@rinatourstanzania.com
+SITE_EMAIL_SECONDARY=rngelula43@gmail.com
+```
+
+Kwenye Render ziweke kwenye Environment.
+
+Mbili ni mpya:
+
+- `SITE_EMAIL_SECONDARY` — alitoa email mbili; ilikuwa inachukua moja tu
+- `SITE_WHATSAPP_DISPLAY` — `wa.me` inahitaji tarakimu na country code bila
+  `+` (`255767753553`), lakini mgeni hapaswi kuonyeshwa hivyo. Sasa link
+  inatumia `255767753553` na maandishi yanaonyesha `0767 753 553`
+
+### Sehemu mbili mpya kwenye homepage
+
+**"Where you'll stay"** — guest house sasa iko homepage, si kwenye nav tu:
+bei kwa mtu BB, km 13 kutoka KIA na dakika 9–15, kitchen wazi, view ya
+Kilimanjaro na Meru.
+
+**Contact kwenye CTA band** — WhatsApp, simu na email zote mbili ziko chini ya
+homepage moja kwa moja, hakuna haja ya click nyingine. Ina `id="contact"` kwa
+hiyo link ya `#contact` inafanya kazi.
+
+### Tours za leo homepage — command mpya
+
+```
+python manage.py feature_new_tours
+python manage.py feature_new_tours --apply
+```
+
+Homepage inaonyesha tours zilizo `featured` **na** `published`. Tours nne za
+leo ni zote mbili hapana, kwa sababu **hazina bei**.
+
+Command **haitachapisha tour isiyo na bei**. Tour homepage isiyo na bei
+haimpi mgeni cha kufanya, na inamletea Rina email ngumu. Weka bei kwenye
+admin kisha run tena.
+
+`--force` ipo kama unataka kweli, lakini sipendekezi.
+
+### ⚠ Bike tour bado haipaswi kuchapishwa
+
+Picha ni **pikipiki**, maelezo ya package yanasema **baiskeli za mlimani**.
+Usiichapishe mpaka client ajibu. Soma `PHOTO-NOTES.md` kwenye zip ya picha.

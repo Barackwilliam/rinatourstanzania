@@ -222,8 +222,15 @@ SITE_NAME = config("SITE_NAME", default="Tour Company")
 SITE_TAGLINE = config("SITE_TAGLINE", default="")
 SITE_PHONE_PRIMARY = config("SITE_PHONE_PRIMARY", default="")
 SITE_PHONE_SECONDARY = config("SITE_PHONE_SECONDARY", default="")
+# Digits only, with country code and no +, because that is what wa.me needs.
 SITE_WHATSAPP = config("SITE_WHATSAPP", default="")
+# How the same number is written for a human to read. wa.me cannot take the
+# local 0767... form, and a visitor should not be shown 255767... either.
+SITE_WHATSAPP_DISPLAY = config("SITE_WHATSAPP_DISPLAY", default="")
 SITE_EMAIL = config("SITE_EMAIL", default="")
+# Rina uses two addresses — a personal one and the company one. Both are
+# published, so a guest can reach a human either way.
+SITE_EMAIL_SECONDARY = config("SITE_EMAIL_SECONDARY", default="")
 SITE_LOCATION = config("SITE_LOCATION", default="")
 SITE_INSTAGRAM = config("SITE_INSTAGRAM", default="")
 SITE_FACEBOOK = config("SITE_FACEBOOK", default="")

@@ -174,6 +174,36 @@
 </section>
 {% endif %}
 
+{% if stay %}
+{% comment %}
+  The guest house, on the homepage rather than only behind the top nav. It is
+  a real part of what Rina sells — bed and breakfast a quarter of an hour from
+  the airport — and a climber looking for somewhere to sleep the night before
+  the gate should not have to go hunting for it.
+{% endcomment %}
+<section class="section section-alt">
+  <div class="container stay-band">
+    <div class="stay-band-copy">
+      <h2>Where you'll stay</h2>
+      <p>{{ stay.short_description|default:stay.name }}</p>
+      <ul class="stay-band-facts">
+        {% if stay.price_from %}
+          <li><strong>From ${{ stay.price_from|floatformat:0 }}</strong> per person, bed &amp; breakfast</li>
+        {% endif %}
+        <li>About 13&nbsp;km from Kilimanjaro International Airport — 9 to 15 minutes</li>
+        <li>Kitchen open to guests; cook for yourself if you'd rather</li>
+        <li>Kilimanjaro and Meru both in view, and the birds that come with the trees</li>
+      </ul>
+      <a class="btn btn-primary" href="{% url 'tours:stay' %}">See the guest house</a>
+    </div>
+    {% if stay.get_image %}
+      <img class="stay-band-image" src="{{ stay.get_image }}" alt="{{ stay.name }}"
+           width="600" height="450" loading="lazy" decoding="async">
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
 {% if transfers %}
 <section class="section">
   <div class="container transfers-band">
@@ -205,10 +235,45 @@
 </section>
 {% endif %}
 
-<section class="section cta-band">
+{% comment %}
+  The CTA band, with the actual contact details in it rather than only a link
+  to the contact page. Most enquiries arrive on WhatsApp, and a visitor who
+  has just scrolled the whole homepage should be able to start typing without
+  one more click.
+{% endcomment %}
+<section class="section cta-band" id="contact">
   <div class="container">
     <h2>Tell us what you have in mind</h2>
     <p>Dates, budget, how long you have — we'll come back with a plan that fits.</p>
+
+    <ul class="cta-contacts">
+      {% if SITE_WHATSAPP %}
+        <li>
+          <span class="cta-contact-label">WhatsApp</span>
+          <a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">
+            {{ SITE_WHATSAPP_DISPLAY|default:SITE_WHATSAPP }}</a>
+        </li>
+      {% endif %}
+      {% if SITE_PHONE_PRIMARY %}
+        <li>
+          <span class="cta-contact-label">Call</span>
+          <a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a>
+        </li>
+      {% endif %}
+      {% if SITE_EMAIL %}
+        <li>
+          <span class="cta-contact-label">Email</span>
+          <a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>
+        </li>
+      {% endif %}
+      {% if SITE_EMAIL_SECONDARY %}
+        <li>
+          <span class="cta-contact-label">Email</span>
+          <a href="mailto:{{ SITE_EMAIL_SECONDARY }}">{{ SITE_EMAIL_SECONDARY }}</a>
+        </li>
+      {% endif %}
+    </ul>
+
     <a class="btn btn-primary" href="{% url 'tours:contact' %}">Start planning</a>
   </div>
 </section>

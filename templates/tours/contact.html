@@ -33,6 +33,7 @@
       {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a></li>{% endif %}
       {% if SITE_PHONE_SECONDARY %}<li><a href="tel:{{ SITE_PHONE_SECONDARY|cut:' ' }}">{{ SITE_PHONE_SECONDARY }}</a></li>{% endif %}
       {% if SITE_EMAIL %}<li><a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a></li>{% endif %}
+      {% if SITE_EMAIL_SECONDARY %}<li><a href="mailto:{{ SITE_EMAIL_SECONDARY }}">{{ SITE_EMAIL_SECONDARY }}</a></li>{% endif %}
       {% if SITE_WHATSAPP %}<li><a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">WhatsApp us</a></li>{% endif %}
       {% if SITE_LOCATION %}<li>{{ SITE_LOCATION }}</li>{% endif %}
     </ul>

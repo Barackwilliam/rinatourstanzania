@@ -18,8 +18,8 @@ class Category(models.Model):
         upload_to="categories/video/", blank=True, null=True, validators=[validate_video])
 
     bead_colour = models.CharField(
-        max_length=7, default="#B98431",
-        help_text="Hex colour of this category's bead in the navigation menu.")
+        max_length=7, default="#B5813F",
+        help_text="Hex colour marking this category in the menu and on cards.")
 
     order = models.PositiveIntegerField(default=0)
     featured = models.BooleanField(default=True, help_text="Show in the main navigation")
@@ -139,6 +139,10 @@ class Package(models.Model):
     destinations = models.ManyToManyField(Destination, blank=True, related_name="packages")
     route = models.CharField(
         max_length=120, blank=True, help_text="Climbing route, e.g. 'Machame Route'")
+    climb_route = models.ForeignKey(
+        "ClimbRoute", on_delete=models.SET_NULL, blank=True, null=True,
+        related_name="packages",
+        help_text="Draws the altitude profile on this tour's page.")
 
     # --- Price ------------------------------------------------------------
     price_from = models.DecimalField(
@@ -280,10 +284,38 @@ class HeroSlide(models.Model):
 
 
 class TransferService(models.Model):
-    """Airport transfers, hotel pickups, city tours — the transport side."""
+    """
+    Airport transfers, town runs and day hire.
+
+    Priced per trip or per day rather than per person — a taxi to Arusha costs
+    the same whether one person or three are in it, and showing a per-person
+    figure would misprice it.
+    """
+    BASIS_CHOICES = [
+        ("trip", "per trip"),
+        ("day", "per day"),
+        ("person", "per person"),
+        ("cup", "per cup"),
+    ]
+
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, unique=True)
     description = models.TextField(blank=True)
+
+    route_from = models.CharField(max_length=120, blank=True)
+    route_to = models.CharField(max_length=120, blank=True)
+    distance_km = models.PositiveIntegerField(blank=True, null=True)
+    duration_text = models.CharField(
+        max_length=60, blank=True, help_text="e.g. '9-15 minutes'")
+
+    price_from = models.DecimalField(
+        max_digits=8, decimal_places=2, blank=True, null=True)
+    price_to = models.DecimalField(
+        max_digits=8, decimal_places=2, blank=True, null=True,
+        help_text="Fill in only when the price is a range.")
+    currency = models.CharField(max_length=8, default="USD")
+    price_basis = models.CharField(max_length=10, choices=BASIS_CHOICES, default="trip")
+
     icon = models.CharField(
         max_length=40, blank=True, help_text="Lucide icon name, e.g. 'plane'")
     image = models.ImageField(
@@ -296,6 +328,97 @@ class TransferService(models.Model):
 
     def __str__(self):
         return self.name
+
+    def price_display(self):
+        if self.price_from is None:
+            return "On request"
+        basis = self.get_price_basis_display()
+        if self.price_to and self.price_to != self.price_from:
+            return f"{self.currency} {self.price_from:,.0f}-{self.price_to:,.0f} {basis}"
+        return f"{self.currency} {self.price_from:,.0f} {basis}"
+
+    def route_display(self):
+        if self.route_from and self.route_to:
+            return f"{self.route_from} to {self.route_to}"
+        return self.route_to or self.route_from or ""
+
+
+class Accommodation(models.Model):
+    """
+    Where guests stay. The operator runs their own place, so this is a room
+    rate rather than a tour: priced per person per night, and the board basis
+    matters because self-catering is allowed.
+    """
+    name = models.CharField(max_length=140)
+    slug = models.SlugField(max_length=160, unique=True)
+    tagline = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+
+    location = models.CharField(max_length=160, blank=True)
+    price_from = models.DecimalField(
+        max_digits=8, decimal_places=2, blank=True, null=True)
+    currency = models.CharField(max_length=8, default="USD")
+    board_basis = models.CharField(
+        max_length=60, blank=True,
+        help_text="e.g. 'Bed & breakfast'. Shown next to the rate.")
+
+    image = models.ImageField(
+        upload_to="stay/", blank=True, null=True, validators=[validate_image])
+    video = models.FileField(
+        upload_to="stay/video/", blank=True, null=True, validators=[validate_video])
+
+    order = models.PositiveIntegerField(default=0)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "name"]
+        verbose_name_plural = "accommodation"
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("tours:stay")
+
+    def price_display(self):
+        if self.price_from is None:
+            return "On request"
+        rate = f"From {self.currency} {self.price_from:,.0f} per person per night"
+        return f"{rate}, {self.board_basis.lower()}" if self.board_basis else rate
+
+
+class AccommodationFeature(models.Model):
+    """One line of what the place offers — views, kitchen access, birdlife."""
+    accommodation = models.ForeignKey(
+        Accommodation, on_delete=models.CASCADE, related_name="features")
+    title = models.CharField(max_length=120)
+    detail = models.CharField(max_length=250, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.title
+
+
+class AccommodationImage(models.Model):
+    accommodation = models.ForeignKey(
+        Accommodation, on_delete=models.CASCADE, related_name="gallery")
+    image = models.ImageField(upload_to="stay/gallery/", validators=[validate_image])
+    alt_text = models.CharField(
+        max_length=200, blank=True,
+        help_text="What the photo shows, for screen readers and search engines. "
+                  "'Guests having coffee on the veranda', not 'IMG_4821'.")
+    caption = models.CharField(
+        max_length=200, blank=True, help_text="Shown under the photo. Optional.")
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.accommodation.name} — image {self.pk}"
 
 
 class Testimonial(models.Model):
@@ -382,8 +505,8 @@ class MapRoute(models.Model):
     name = models.CharField(max_length=120)
     slug = models.SlugField(max_length=140, unique=True)
     colour = models.CharField(
-        max_length=7, default="#B98431",
-        help_text="Hex colour for the line and its legend swatch, e.g. #B98431")
+        max_length=7, default="#B5813F",
+        help_text="Hex colour for the line and its legend swatch, e.g. #C2662B")
     summary = models.CharField(max_length=200, blank=True)
     package = models.ForeignKey(
         Package, on_delete=models.SET_NULL, blank=True, null=True,
@@ -492,3 +615,96 @@ class RouteStop(models.Model):
 
     def __str__(self):
         return f"{self.route.name} — {self.order}. {self.destination.name}"
+
+
+class ClimbRoute(models.Model):
+    """
+    A named way up a mountain, with its camps and their altitudes.
+
+    Kept separate from Package because several packages share one route — the
+    six-day and seven-day Machame climbs walk the same path at different paces —
+    and the profile should be edited once, not once per package.
+    """
+    name = models.CharField(max_length=80, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    mountain = models.CharField(max_length=80, default="Mount Kilimanjaro")
+    summary = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return f"{self.mountain} — {self.name}"
+
+    def stage_list(self):
+        return list(self.stages.all())
+
+    def summit(self):
+        stages = self.stage_list()
+        return max(stages, key=lambda s: s.altitude_m) if stages else None
+
+    def profile(self, width=760, height=250, pad_x=18, pad_top=30, pad_bottom=44):
+        """
+        Project the camps onto SVG coordinates.
+
+        The vertical scale starts a little below the lowest camp rather than at
+        sea level: on a 0-5895 scale every camp between 1600 and 4700 bunches
+        into a band and the shape of the climb disappears.
+        """
+        stages = self.stage_list()
+        if len(stages) < 2:
+            return {"points": [], "line": "", "area": "", "length": 1}
+
+        highs = [s.altitude_m for s in stages]
+        low, high = min(highs), max(highs)
+        span = max(high - low, 1)
+        floor = low - span * 0.10
+        ceiling = high + span * 0.06
+        vspan = ceiling - floor
+
+        inner_w = width - pad_x * 2
+        inner_h = height - pad_top - pad_bottom
+
+        points = []
+        for i, stage in enumerate(stages):
+            x = pad_x + (inner_w * i / (len(stages) - 1))
+            y = pad_top + inner_h * (1 - (stage.altitude_m - floor) / vspan)
+            points.append({"stage": stage, "x": round(x, 1), "y": round(y, 1)})
+
+        line = "M" + " L".join(f"{p['x']},{p['y']}" for p in points)
+        base = height - pad_bottom
+        area = (f"M{points[0]['x']},{base} L"
+                + " L".join(f"{p['x']},{p['y']}" for p in points)
+                + f" L{points[-1]['x']},{base} Z")
+
+        length = 0.0
+        for a, b in zip(points, points[1:]):
+            length += ((b["x"] - a["x"]) ** 2 + (b["y"] - a["y"]) ** 2) ** 0.5
+
+        return {
+            "points": points,
+            "line": line,
+            "area": area,
+            "length": round(length * 1.05) or 1,
+            "base": base,
+            "width": width,
+            "height": height,
+        }
+
+
+class ClimbStage(models.Model):
+    route = models.ForeignKey(ClimbRoute, on_delete=models.CASCADE, related_name="stages")
+    order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100)
+    altitude_m = models.PositiveIntegerField(help_text="Metres above sea level")
+    day = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.name} ({self.altitude_m} m)"
+
+    def altitude_ft(self):
+        return round(self.altitude_m * 3.28084 / 10) * 10

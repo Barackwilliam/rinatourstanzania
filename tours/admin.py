@@ -4,8 +4,9 @@ from django.utils.html import format_html
 
 from .models import (
     Category, Destination, Package, ItineraryDay, PackageImage, HeroSlide,
-    MapRoute, RouteStop, TransferService, Testimonial, TeamMember, FAQ,
-    ContactMessage,
+    MapRoute, RouteStop, ClimbRoute, ClimbStage, TransferService, Testimonial,
+    TeamMember, FAQ, ContactMessage, Accommodation, AccommodationFeature,
+    AccommodationImage,
 )
 
 
@@ -70,7 +71,7 @@ class PackageAdmin(admin.ModelAdmin):
         }),
         ("Duration & route", {
             "fields": ("duration_days", "duration_nights", "duration_text",
-                       "starting_point", "destinations", "route")
+                       "starting_point", "destinations", "route", "climb_route")
         }),
         ("Price", {"fields": ("price_from", "currency", "price_basis")}),
         ("Copy", {
@@ -109,6 +110,29 @@ class MapRouteAdmin(admin.ModelAdmin):
         return obj.stops.count()
 
 
+class ClimbStageInline(admin.TabularInline):
+    model = ClimbStage
+    extra = 1
+
+
+@admin.register(ClimbRoute)
+class ClimbRouteAdmin(admin.ModelAdmin):
+    list_display = ("name", "mountain", "camp_count", "summit_altitude", "order")
+    list_editable = ("order",)
+    list_filter = ("mountain",)
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = [ClimbStageInline]
+
+    @admin.display(description="camps")
+    def camp_count(self, obj):
+        return obj.stages.count()
+
+    @admin.display(description="summit")
+    def summit_altitude(self, obj):
+        summit = obj.summit()
+        return f"{summit.altitude_m} m" if summit else "—"
+
+
 @admin.register(HeroSlide)
 class HeroSlideAdmin(admin.ModelAdmin):
     list_display = ("headline", "has_video", "order", "active")
@@ -118,9 +142,35 @@ class HeroSlideAdmin(admin.ModelAdmin):
 
 @admin.register(TransferService)
 class TransferServiceAdmin(admin.ModelAdmin):
-    list_display = ("name", "order", "active")
+    list_display = ("name", "route_display", "price_display", "order", "active")
     list_editable = ("order", "active")
     prepopulated_fields = {"slug": ("name",)}
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "description", "icon", "image",
+                           "order", "active")}),
+        ("Route", {"fields": ("route_from", "route_to", "distance_km",
+                              "duration_text")}),
+        ("Price", {"fields": ("price_from", "price_to", "currency", "price_basis")}),
+    )
+
+
+class AccommodationFeatureInline(admin.TabularInline):
+    model = AccommodationFeature
+    extra = 1
+
+
+class AccommodationImageInline(admin.TabularInline):
+    model = AccommodationImage
+    extra = 1
+    fields = ("image", "alt_text", "caption", "order")
+
+
+@admin.register(Accommodation)
+class AccommodationAdmin(admin.ModelAdmin):
+    list_display = ("name", "location", "price_display", "board_basis", "active")
+    list_editable = ("active",)
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = [AccommodationFeatureInline, AccommodationImageInline]
 
 
 @admin.register(Testimonial)

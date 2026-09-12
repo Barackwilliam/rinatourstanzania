@@ -47,6 +47,12 @@
     </section>
     {% endif %}
 
+    {% if package.climb_route %}
+      {% with climb=package.climb_route %}
+        {% include "tours/partials/climb_profile.html" %}
+      {% endwith %}
+    {% endif %}
+
     {% if package.highlight_list %}
     <section class="package-block">
       <h2>Highlights</h2>

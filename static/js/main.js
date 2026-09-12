@@ -184,36 +184,53 @@
       map.classList.add('is-drawing');
     }
 
-    var keys = document.querySelectorAll('.route-key');
+    var keys = Array.prototype.slice.call(document.querySelectorAll('.route-key'));
     var legend = document.querySelector('.routes-legend');
-    var pinned = null;   // set by clicking; survives the mouse leaving
-    var hovered = null;  // transient
+    var open = null;   // the route whose stops are showing
+    var hovered = null;
 
-    function apply() {
-      var slug = pinned || hovered;
+    function detailFor(slug) {
+      return document.getElementById('route-detail-' + slug);
+    }
+
+    function paint() {
+      var slug = open || hovered;
       map.classList.toggle('has-focus', Boolean(slug));
       map.querySelectorAll('[data-route]').forEach(function (el) {
         el.classList.toggle('is-focused', el.dataset.route === slug);
       });
       keys.forEach(function (k) {
-        k.setAttribute('aria-pressed', k.dataset.route === pinned ? 'true' : 'false');
+        var isOpen = k.dataset.route === open;
+        k.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        var detail = detailFor(k.dataset.route);
+        if (detail) detail.hidden = !isOpen;
       });
     }
 
     keys.forEach(function (key) {
       var slug = key.dataset.route;
+
       key.addEventListener('click', function () {
-        pinned = (pinned === slug) ? null : slug;
-        apply();
+        open = (open === slug) ? null : slug;
+        hovered = null;
+        paint();
+        /* On a phone the map is above the legend, so bring it back into view
+           when a route is opened — otherwise the highlight happens offscreen. */
+        if (open && window.matchMedia('(max-width: 980px)').matches) {
+          map.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
-      key.addEventListener('mouseenter', function () { hovered = slug; apply(); });
-      key.addEventListener('focus', function () { hovered = slug; apply(); });
-      key.addEventListener('blur', function () { hovered = null; apply(); });
+
+      key.addEventListener('mouseenter', function () { hovered = slug; paint(); });
+      key.addEventListener('focus', function () { hovered = slug; paint(); });
+      key.addEventListener('blur', function () { hovered = null; paint(); });
     });
 
     if (legend) {
-      legend.addEventListener('mouseleave', function () { hovered = null; apply(); });
+      legend.addEventListener('mouseleave', function () { hovered = null; paint(); });
     }
+
+    paint();
   }
 
   /* --- Scroll reveal ----------------------------------------------------
@@ -252,5 +269,98 @@
     new IntersectionObserver(function (entries) {
       header.classList.toggle('is-stuck', !entries[0].isIntersecting);
     }, { threshold: 0 }).observe(sentinel);
+  }
+
+  /* --- Tour index filter ------------------------------------------------
+     Every tour is already in the DOM, so filtering is a class toggle rather
+     than a request. Matching runs against a pre-built data-search string
+     holding the title, category, starting point, duration and destinations —
+     built once server-side so we are not lowercasing 174 rows on every
+     keystroke. */
+  var filterInput = document.getElementById('index-filter');
+  if (filterInput) {
+    var rows = Array.prototype.slice.call(document.querySelectorAll('[data-row]'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('[data-group]'));
+    var counter = document.getElementById('index-count');
+    var empty = document.getElementById('index-empty');
+    var total = rows.length;
+    var pending = null;
+
+    function apply() {
+      var terms = filterInput.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      var shown = 0;
+
+      rows.forEach(function (row) {
+        var hay = row.dataset.search;
+        /* Every word must appear somewhere, so "3 days zanzibar" narrows
+           rather than widening the way an OR match would. */
+        var match = terms.every(function (t) { return hay.indexOf(t) !== -1; });
+        row.hidden = !match;
+        if (match) shown++;
+      });
+
+      groups.forEach(function (group) {
+        var any = group.querySelector('[data-row]:not([hidden])');
+        group.hidden = !any;
+      });
+
+      if (counter) {
+        counter.textContent = terms.length
+          ? 'Showing ' + shown + ' of ' + total
+          : 'Showing all ' + total;
+      }
+      if (empty) empty.hidden = shown !== 0;
+    }
+
+    filterInput.addEventListener('input', function () {
+      /* One frame of debounce keeps typing smooth on a long list. */
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(apply);
+    });
+
+    filterInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { filterInput.value = ''; apply(); }
+    });
+  }
+
+  /* --- Climb profile ----------------------------------------------------
+     Draws itself once on scroll, and keeps the chart tied to the camp list:
+     touching either half marks the same camp in the other. On a phone the two
+     are stacked, so without this the chart is decoration. */
+  var climbFigure = document.querySelector('.climb-figure');
+  if (climbFigure) {
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          climbFigure.classList.add('is-drawing');
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.3 }).observe(climbFigure);
+    } else {
+      climbFigure.classList.add('is-drawing');
+    }
+
+    var camps = document.querySelectorAll('[data-camp]');
+    var campRows = document.querySelectorAll('[data-camp-row]');
+
+    function markCamp(i) {
+      camps.forEach(function (c) {
+        c.classList.toggle('is-active', c.dataset.camp === i);
+      });
+      campRows.forEach(function (r) {
+        r.classList.toggle('is-active', r.dataset.campRow === i);
+      });
+    }
+
+    campRows.forEach(function (row) {
+      row.addEventListener('mouseenter', function () { markCamp(row.dataset.campRow); });
+      row.addEventListener('click', function () { markCamp(row.dataset.campRow); });
+      row.addEventListener('mouseleave', function () { markCamp(null); });
+    });
+    camps.forEach(function (camp) {
+      camp.addEventListener('mouseenter', function () { markCamp(camp.dataset.camp); });
+      camp.addEventListener('mouseleave', function () { markCamp(null); });
+    });
   }
 })();

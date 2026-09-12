@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Every tour — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}The complete list of every tour {{ SITE_NAME }} runs, grouped by category.{% endblock %}
+{% block content %}
+
+<section class="page-head">
+  <div class="container">
+    <h1>Every tour</h1>
+    <p>All {{ total }} trips on one page, grouped by category. Type to filter — it narrows as you go.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="index-search">
+      <label class="field index-field">
+        <span class="visually-hidden">Search tours</span>
+        <input type="search" id="index-filter" autocomplete="off"
+               placeholder="Kilimanjaro, Zanzibar, 3 days, camping…">
+      </label>
+      <p class="index-count" id="index-count" role="status" aria-live="polite">
+        Showing all {{ total }}
+      </p>
+    </div>
+
+    <div id="index-groups">
+      {% for category, rows in groups %}
+        <section class="index-group" data-group>
+          <h2 class="index-group-head" style="--cat:{{ category.bead_colour }}">
+            <span>{{ category.name }}</span>
+            <span class="index-group-count">{{ rows|length }}</span>
+          </h2>
+
+          <ul class="index-list">
+            {% for p in rows %}
+              <li class="index-row" data-row
+                  data-search="{{ p.title|lower }} {{ category.name|lower }} {{ p.starting_point|lower }} {{ p.duration_display|lower }}{% for d in p.destinations.all %} {{ d.name|lower }}{% endfor %}">
+                <a href="{{ p.get_absolute_url }}">
+                  <span class="index-title">{{ p.title }}</span>
+                  <span class="index-meta">
+                    {% if p.duration_display %}<span class="index-dur">{{ p.duration_display }}</span>{% endif %}
+                    {% if p.starting_point %}<span class="index-from">from {{ p.starting_point }}</span>{% endif %}
+                  </span>
+                  <span class="index-price">
+                    {% if p.price_from %}{{ p.currency }} {{ p.price_from|floatformat:0 }}{% else %}On request{% endif %}
+                  </span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </div>
+
+    <p class="index-empty" id="index-empty" hidden>
+      Nothing matches that. <a href="{% url 'tours:contact' %}">Tell us what you're looking for</a> and we'll build it.
+    </p>
+
+  </div>
+</section>
+{% endblock %}

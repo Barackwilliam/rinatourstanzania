@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import ContactForm
 from .data.tanzania_map import OUTLINES, VIEWBOX
 from .models import (
-    Category, Destination, FAQ, HeroSlide, MapRoute, Package, TeamMember,
-    TransferService, Testimonial,
+    Accommodation, Category, Destination, FAQ, HeroSlide, MapRoute, Package,
+    TeamMember, TransferService, Testimonial,
 )
 
 
@@ -31,6 +31,7 @@ def home(request):
             .select_related("package")
             .prefetch_related("stops__destination")
         ),
+        "total_packages": _published().count(),
         "map_outlines": OUTLINES,
         "map_viewbox": VIEWBOX,
     }
@@ -75,6 +76,34 @@ def package_list(request):
         "total": packages.count(),
     }
     return render(request, "tours/package_list.html", context)
+
+
+def package_index(request):
+    """
+    Every tour on one page, grouped by category.
+
+    The paginated listing is for browsing; this is for finding. With 174 tours
+    across 15 pages, checking whether a particular trip is on the site meant
+    clicking Next fourteen times. Here everything is in the DOM at once, so the
+    search box filters instantly and Ctrl+F works on the whole catalogue.
+    """
+    packages = (
+        _published()
+        .select_related("primary_category")
+        .prefetch_related("destinations")
+        .order_by("primary_category__order", "duration_days", "title")
+    )
+
+    groups = []
+    for category in Category.objects.all():
+        rows = [p for p in packages if p.primary_category_id == category.id]
+        if rows:
+            groups.append((category, rows))
+
+    return render(request, "tours/package_index.html", {
+        "groups": groups,
+        "total": len(packages),
+    })
 
 
 def package_detail(request, slug):
@@ -134,6 +163,20 @@ def day_trip_list(request):
 def transfers(request):
     return render(request, "tours/transfers.html", {
         "transfers": TransferService.objects.filter(active=True),
+        "stay": Accommodation.objects.filter(active=True).first(),
+    })
+
+
+def stay(request):
+    """The operator's own guest house."""
+    accommodation = (
+        Accommodation.objects.filter(active=True)
+        .prefetch_related("features", "gallery")
+        .first()
+    )
+    return render(request, "tours/stay.html", {
+        "stay": accommodation,
+        "transfers": TransferService.objects.filter(active=True),
     })
 
 
@@ -155,6 +198,8 @@ def reviews(request):
 
 def contact(request):
     initial = {}
+    if request.GET.get("stay"):
+        initial["package_interest"] = "Accommodation"
     package_slug = request.GET.get("package")
     package = None
     if package_slug:

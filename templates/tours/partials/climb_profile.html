@@ -1,0 +1,61 @@
+{% with profile=climb.profile summit=climb.summit %}
+<section class="climb" id="climb-profile">
+  <h2>How {{ climb.name }} climbs</h2>
+  {% if climb.summary %}<p class="climb-summary">{{ climb.summary }}</p>{% endif %}
+
+  <div class="climb-figure">
+    <svg class="climb-svg" viewBox="0 0 {{ profile.width }} {{ profile.height }}"
+         preserveAspectRatio="xMidYMid meet" role="img"
+         aria-labelledby="climb-title climb-desc">
+      <title id="climb-title">Altitude profile of {{ climb.name }}</title>
+      <desc id="climb-desc">
+        The route rises from {{ profile.points.0.stage.altitude_m }} metres at
+        {{ profile.points.0.stage.name }} to {{ summit.altitude_m }} metres at
+        {{ summit.name }}. Every camp and its altitude is listed below the chart.
+      </desc>
+
+      <defs>
+        <linearGradient id="climb-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--copper)" stop-opacity="0.30"/>
+          <stop offset="100%" stop-color="var(--copper)" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+
+      <path class="climb-area" d="{{ profile.area }}" fill="url(#climb-fill)"/>
+      <path class="climb-line" d="{{ profile.line }}" style="--len:{{ profile.length }}"/>
+
+      <g class="climb-camps">
+        {% for pt in profile.points %}
+          <g class="climb-camp{% if pt.stage.altitude_m == summit.altitude_m %} is-summit{% endif %}"
+             data-camp="{{ forloop.counter0 }}"
+             style="--delay:{{ forloop.counter0 }}80ms">
+            <line x1="{{ pt.x }}" y1="{{ pt.y }}" x2="{{ pt.x }}" y2="{{ profile.base }}"/>
+            <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="{% if pt.stage.altitude_m == summit.altitude_m %}6{% else %}4.5{% endif %}"/>
+            <title>{{ pt.stage.name }} — {{ pt.stage.altitude_m }} m</title>
+          </g>
+        {% endfor %}
+      </g>
+    </svg>
+  </div>
+
+  {# The chart shows the shape; this list carries the names and numbers. On a
+     phone that is the part people actually read, so it is a list rather than
+     labels crammed onto the drawing. #}
+  <ol class="climb-camp-list">
+    {% for pt in profile.points %}
+      <li class="climb-camp-row{% if pt.stage.altitude_m == summit.altitude_m %} is-summit{% endif %}"
+          data-camp-row="{{ forloop.counter0 }}">
+        <span class="climb-camp-dot"></span>
+        <span class="climb-camp-name">{{ pt.stage.name }}</span>
+        {% if pt.stage.day %}<span class="climb-camp-day">Day {{ pt.stage.day }}</span>{% endif %}
+        <span class="climb-camp-alt">{{ pt.stage.altitude_m }} m</span>
+      </li>
+    {% endfor %}
+  </ol>
+
+  <p class="climb-note">
+    Altitudes are approximate. Summit night begins in the dark so you reach
+    {{ summit.name }} around sunrise, weather permitting.
+  </p>
+</section>
+{% endwith %}

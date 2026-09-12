@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{% if stay %}{{ stay.name }} — {% endif %}Where you stay — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% if stay %}{{ stay.tagline }} {{ stay.price_display }}.{% endif %}{% endblock %}
+{% block content %}
+
+{% if stay %}
+<section class="page-head">
+  <div class="container">
+    <h1>Where you stay</h1>
+    {% if stay.tagline %}<p class="lede">{{ stay.tagline }}</p>{% endif %}
+    <p class="page-head-meta">{{ stay.price_display }}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container stay-layout">
+    <div class="stay-main">
+      {% if stay.image %}
+        <img class="stay-hero-img" src="{{ stay.image.url }}" alt="{{ stay.name }}">
+      {% endif %}
+
+      {% if stay.description %}<div class="prose">{{ stay.description|linebreaks }}</div>{% endif %}
+
+      {% if stay.features.all %}
+        <div class="stay-features">
+          {% for f in stay.features.all %}
+            <div class="stay-feature">
+              <h3>{{ f.title }}</h3>
+              {% if f.detail %}<p>{{ f.detail }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if stay.gallery.all %}
+        <div class="gallery stay-gallery">
+          {% for shot in stay.gallery.all %}
+            <figure><img src="{{ shot.image.url }}" alt="{{ shot.alt_text|default:shot.caption }}" loading="lazy">
+            {% if shot.caption %}<figcaption>{{ shot.caption }}</figcaption>{% endif %}</figure>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if transfers %}
+        <section class="stay-transfers">
+          <h2>Getting to and from us</h2>
+          <ul class="rate-list">
+            {% for t in transfers %}
+              <li class="rate-row">
+                <span class="rate-name">
+                  {{ t.name }}
+                  {% if t.route_display %}<span class="rate-route">{{ t.route_display }}</span>{% endif %}
+                </span>
+                <span class="rate-meta">
+                  {% if t.distance_km %}{{ t.distance_km }} km{% endif %}
+                  {% if t.duration_text %}<span>{{ t.duration_text }}</span>{% endif %}
+                </span>
+                <span class="rate-price">{{ t.price_display }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+          <p class="rate-note">
+            Transfer prices are per vehicle, not per person — the fare is the same
+            whether one of you travels or three.
+          </p>
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="package-side">
+      <div class="booking-card">
+        <p class="booking-price">{{ stay.price_display }}</p>
+        <dl class="booking-facts">
+          {% if stay.location %}<div><dt>Where</dt><dd>{{ stay.location }}</dd></div>{% endif %}
+          {% if stay.board_basis %}<div><dt>Rate includes</dt><dd>{{ stay.board_basis }}</dd></div>{% endif %}
+          <div><dt>Kitchen</dt><dd>Open to guests, no charge</dd></div>
+        </dl>
+        <a class="btn btn-primary btn-block" href="{% url 'tours:contact' %}?stay=1">Check availability</a>
+        {% if SITE_WHATSAPP %}
+          <a class="btn btn-ghost btn-block" href="https://wa.me/{{ SITE_WHATSAPP }}?text=Hello, I'd like to ask about accommodation" rel="noopener" target="_blank">Ask on WhatsApp</a>
+        {% endif %}
+        <p class="booking-note">Rates vary with season and how many of you are travelling.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+{% else %}
+<section class="page-head"><div class="container">
+  <h1>Where you stay</h1>
+</div></section>
+<section class="section"><div class="container">
+  <p class="empty">Accommodation details are being added.
+    <a href="{% url 'tours:contact' %}">Ask us directly</a> in the meantime.</p>
+</div></section>
+{% endif %}
+
+{% endblock %}

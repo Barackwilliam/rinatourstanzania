@@ -77,8 +77,8 @@ COORDINATES = {
 
 
 # The lines drawn on the homepage map. Each is a real journey shape the
-# operator sells; the colours are chosen to stay apart from one another and
-# to read against the ivory map background.
+# operator sells. The colours have to stay apart from one another AND read
+# against the warm cream landmass, which rules out anything sandy or gold.
 ROUTES = [
     {
         "name": "Northern circuit safari",
@@ -92,7 +92,7 @@ ROUTES = [
     {
         "name": "Bush to beach",
         "slug": "bush-to-beach",
-        "colour": "#B98431",
+        "colour": "#C2662B",
         "summary": "Northern parks first, then the Indian Ocean.",
         "package_slug": "10-days-tanzania-safari-and-zanzibar-beach",
         "stops": ["Arusha", "Tarangire National Park", "Serengeti National Park",
@@ -101,7 +101,7 @@ ROUTES = [
     {
         "name": "Kilimanjaro & Zanzibar",
         "slug": "kilimanjaro-zanzibar",
-        "colour": "#2F6F5E",
+        "colour": "#1F6F6B",
         "summary": "Africa's highest peak, then recovery on the coast.",
         "package_slug": "mount-kilimanjaro-7-days-machame-route",
         "stops": ["Moshi", "Mount Kilimanjaro", "Dar es Salaam", "Stone Town", "Paje"],
@@ -109,7 +109,7 @@ ROUTES = [
     {
         "name": "Southern parks",
         "slug": "southern-parks",
-        "colour": "#3E5C8A",
+        "colour": "#35497F",
         "summary": "Mikumi, Nyerere and Ruaha, out of Dar es Salaam.",
         "package_slug": "3-days-nyerere-wildlife-and-boat-safari",
         "stops": ["Dar es Salaam", "Mikumi National Park", "Nyerere National Park",
@@ -118,7 +118,7 @@ ROUTES = [
     {
         "name": "Coast & islands",
         "slug": "coast-islands",
-        "colour": "#00767F",
+        "colour": "#4E6B22",
         "summary": "Saadani, the old Swahili ports and Zanzibar.",
         "package_slug": "saadani-and-zanzibar-combination",
         "stops": ["Dar es Salaam", "Bagamoyo", "Saadani National Park", "Pangani",
@@ -127,7 +127,7 @@ ROUTES = [
     {
         "name": "Mountains & highlands",
         "slug": "mountains-highlands",
-        "colour": "#6B4E9E",
+        "colour": "#7A3A6B",
         "summary": "Meru, the Usambaras and the Udzungwa forests.",
         "package_slug": "usambara-mountains-trekking",
         "stops": ["Arusha", "Mount Meru", "Pare Mountains", "Usambara Mountains",

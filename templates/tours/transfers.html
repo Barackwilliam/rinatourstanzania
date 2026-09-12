@@ -6,16 +6,39 @@
   <p>Airport pickups, hotel drop-offs, city tours and long-distance travel with our own drivers.</p>
 </div></section>
 <section class="section"><div class="container">
-  <div class="service-grid">
+  <ul class="rate-list">
     {% for t in transfers %}
-      <div class="service-card">
-        <h2>{{ t.name }}</h2>
-        {% if t.description %}<p>{{ t.description }}</p>{% endif %}
-      </div>
+      <li class="rate-row">
+        <span class="rate-name">
+          {{ t.name }}
+          {% if t.route_display %}<span class="rate-route">{{ t.route_display }}</span>{% endif %}
+          {% if t.description %}<span class="rate-desc">{{ t.description }}</span>{% endif %}
+        </span>
+        <span class="rate-meta">
+          {% if t.distance_km %}{{ t.distance_km }} km{% endif %}
+          {% if t.duration_text %}<span>{{ t.duration_text }}</span>{% endif %}
+        </span>
+        <span class="rate-price">{{ t.price_display }}</span>
+      </li>
     {% empty %}
-      <p class="empty">Transfer services will be listed here shortly. <a href="{% url 'tours:contact' %}">Ask us directly</a> in the meantime.</p>
+      <li class="empty">Transfer prices are being added.
+        <a href="{% url 'tours:contact' %}">Ask us directly</a> in the meantime.</li>
     {% endfor %}
-  </div>
+  </ul>
+  <p class="rate-note">
+    Prices are per vehicle, not per person — the fare is the same whether one of
+    you travels or three.
+  </p>
+
+  {% if stay %}
+    <div class="stay-teaser">
+      <div>
+        <h2>We also have rooms</h2>
+        <p>{{ stay.tagline }} {{ stay.price_display }}.</p>
+      </div>
+      <a class="btn btn-primary" href="{% url 'tours:stay' %}">See the guest house</a>
+    </div>
+  {% endif %}
   <p class="section-cta"><a class="btn btn-primary" href="{% url 'tours:contact' %}">Request a transfer</a></p>
 </div></section>
 {% endblock %}

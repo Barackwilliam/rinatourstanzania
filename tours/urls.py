@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.home, name="home"),
 
     path("tours/", views.package_list, name="package_list"),
+    path("tours/all/", views.package_index, name="package_index"),
     path("tours/<slug:slug>/", views.package_detail, name="package_detail"),
 
     path("categories/", views.category_list, name="category_list"),
@@ -18,6 +19,7 @@ urlpatterns = [
 
     path("day-trips/", views.day_trip_list, name="day_trip_list"),
     path("transfers/", views.transfers, name="transfers"),
+    path("stay/", views.stay, name="stay"),
 
     path("about/", views.about, name="about"),
     path("reviews/", views.reviews, name="reviews"),

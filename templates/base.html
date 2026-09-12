@@ -130,15 +130,21 @@
                 <div class="mega-col">
                   <p class="mega-heading">Quick ways in</p>
                   <ul class="mega-links">
+                    <li><a href="{% url 'tours:package_index' %}"><span class="mega-text">
+                      <span class="mega-title">Every tour, one page</span>
+                      <span class="mega-sub">All 174, type to filter</span></span></a></li>
                     <li><a href="{% url 'tours:package_list' %}"><span class="mega-text">
-                      <span class="mega-title">All tours</span>
-                      <span class="mega-sub">Every trip, filterable</span></span></a></li>
+                      <span class="mega-title">Browse with photos</span>
+                      <span class="mega-sub">Filter by category and place</span></span></a></li>
                     <li><a href="{% url 'tours:day_trip_list' %}"><span class="mega-text">
                       <span class="mega-title">Day trips</span>
                       <span class="mega-sub">Out and back the same day</span></span></a></li>
                     <li><a href="{% url 'tours:transfers' %}"><span class="mega-text">
                       <span class="mega-title">Transfers</span>
-                      <span class="mega-sub">Airports, hotels, city runs</span></span></a></li>
+                      <span class="mega-sub">Airport, town runs, day hire</span></span></a></li>
+                    <li><a href="{% url 'tours:stay' %}"><span class="mega-text">
+                      <span class="mega-title">Where you stay</span>
+                      <span class="mega-sub">Our guest house near the airport</span></span></a></li>
                     <li><a href="{% url 'tours:home' %}#routes"><span class="mega-text">
                       <span class="mega-title">Routes map</span>
                       <span class="mega-sub">See the journeys drawn out</span></span></a></li>
@@ -203,6 +209,7 @@
             </div>
           </div>
         </li>
+        <li><a href="{% url 'tours:stay' %}">Stay</a></li>
         <li><a href="{% url 'tours:reviews' %}">Reviews</a></li>
         <li><a href="{% url 'tours:about' %}">About</a></li>
         <li><a href="{% url 'tours:faq' %}">FAQ</a></li>
@@ -261,6 +268,7 @@
         <li><a href="{% url 'tours:about' %}">About us</a></li>
         <li><a href="{% url 'tours:destination_list' %}">Destinations</a></li>
         <li><a href="{% url 'tours:transfers' %}">Transfers</a></li>
+        <li><a href="{% url 'tours:stay' %}">Stay</a></li>
         <li><a href="{% url 'tours:reviews' %}">Reviews</a></li>
         <li><a href="{% url 'tours:faq' %}">FAQ</a></li>
         <li><a href="{% url 'tours:contact' %}">Contact</a></li>

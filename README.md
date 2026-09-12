@@ -42,6 +42,8 @@ The rest is the same on every platform:
 python manage.py migrate
 python manage.py import_packages      # loads all 174 tours
 python manage.py seed_map             # destination coordinates + routes map
+python manage.py seed_hero            # three starter hero slides
+python manage.py apply_priorities     # category order + featured tours
 python manage.py createsuperuser
 python manage.py runserver
 ```
@@ -194,15 +196,152 @@ drawn would be visible.
 
 The lines draw themselves once, the first time the map scrolls into view.
 Selecting a legend entry dims the others so one journey can be followed across
-the country. Both respect `prefers-reduced-motion`.
+the country, and opens that route's stops in order underneath.
+
+**On a phone** the map and its legend have to read as one object. Stacked with a
+gap they did not — you saw six coloured lines, scrolled past, and met an
+unrelated list. The legend now sits flush under the map, and opening a route
+both isolates it above and lists its stops below, scrolling the map back into
+view so the highlight is not happening offscreen.
+
+Both respect `prefers-reduced-motion`.
 
 ---
 
+## Search
+
+There is a search box in the hero, directly under the headline. The filters on
+the listing page were only ever found by people who already knew to scroll.
+
+## Finding a tour among 174
+
+There are two listings and they do different jobs.
+
+- `/tours/` browses with photographs, filters and 12 per page.
+- `/tours/all/` is the **complete index** — every tour on one page, grouped by
+  category, with a search box that filters as you type.
+
+The index exists because of a real problem: with 174 tours across 15 paginated
+pages, checking whether a particular trip was on the site meant clicking Next
+fourteen times, and the client reasonably concluded tours were missing. Nothing
+was missing. Everything is in the DOM on that page at once, so filtering is a
+class toggle rather than a request, and `Ctrl+F` works across the whole
+catalogue.
+
+Matching is AND, not OR — typing `3 days zanzibar` narrows to trips that are
+both, which is how people actually search. The string each row matches against
+(title, category, starting point, duration, destinations) is built server-side
+so nothing is being lowercased on every keystroke.
+
+## Importing photographs
+
+```bash
+python manage.py import_photos stay ./photos              # dry run first: --dry-run
+python manage.py import_photos stay ./photos --cover 3
+python manage.py import_photos package <slug> ./photos
+python manage.py import_photos destination <slug> ./photos
+```
+
+Uploading through the admin works, but a photograph off a phone is commonly
+4000 px wide and 6-9 MB. Ten of those is most of a Supabase free-tier bucket,
+and the page would be unusable on Tanzanian mobile data. This resizes to
+2000 px, re-encodes as progressive JPEG, and imports the whole folder in one go.
+The first photo by filename becomes the cover; `--cover N` picks a different one.
+
+**It strips EXIF, and that is the important part.** Phone photographs carry GPS
+coordinates, the device name and the exact time. Published untouched, a picture
+of the guest house tells anyone who downloads it precisely where the building
+is. The command rebuilds each image from its pixels alone, so none of that
+survives. Verified: zero EXIF tags on the imported files.
+
+If a file comes out *larger* than the original the command says so rather than
+uploading it quietly — that means the source was already compressed and
+re-encoding cost quality for nothing.
+
+Afterwards, open each photo in the admin and write its `alt_text`. A photograph
+with no description is invisible to a screen reader and to search engines.
+
+## The guest house and transfer rates
+
+```bash
+python manage.py seed_stay
+```
+
+The operator runs their own accommodation near Kilimanjaro International
+Airport, which makes this more than a tour catalogue. `/stay/` carries the room
+rate, what the place offers, and the transfer prices for getting to it.
+
+Transfers are priced **per vehicle, not per person** — a taxi to Arusha costs
+the same whether one of you travels or three, and a per-person figure would
+misprice it. `TransferService.price_basis` keeps that explicit, and both the
+transfers page and the stay page say so in plain words underneath.
+
+Two figures came from the client with real ambiguity in them, noted in
+`tours/data/stay.py` rather than quietly resolved:
+
+- The airport transfer was written as "$ to 70 dollar per trip", which is either
+  a flat 70 or a range with the lower number missing. It is entered as a flat 70
+  and needs confirming.
+- "9 to 15 minutes" to cover 13 km is the client's own figure, kept as written.
+
+## Mountain climb profiles
+
+```bash
+python manage.py seed_climbs
+```
+
+Builds an altitude profile for each way up Kilimanjaro (Machame, Lemosho,
+Marangu, Rongai, Umbwe, Northern Circuit) plus Mount Meru, and attaches it to
+every package that walks that route. Twelve tours get one.
+
+The chart is the shape of the climb: Machame visibly rises to Lava Tower, drops
+to Barranco, then climbs again to the summit — the "climb high, sleep low"
+pattern the route is chosen for. The vertical scale starts just below the lowest
+camp rather than at sea level, because on a 0–5895 scale every camp between
+1600 m and 4700 m bunches into one band and the shape disappears.
+
+`ClimbRoute` is separate from `Package` because several packages share one
+route — the six-day and seven-day Machame climbs walk the same path at
+different paces — so the profile is edited once, in the admin, not once per
+tour. Altitudes are the standard published figures and are approximate; a guide
+who knows better can correct any of them without touching code.
+
+**On a phone** the chart alone would be decoration, so every camp is also a row
+in a list underneath with its name, day and altitude. Touching either half
+marks the same camp in the other.
+
+## Priorities
+
+```bash
+python manage.py apply_priorities
+```
+
+Reads `tours/data/priorities.py`, which holds two lists: the order categories
+appear in, and the tours that fill the featured row on the homepage. Mountain
+trekking leads both — Kilimanjaro and Meru are what the business sells on.
+
+Edit those two lists and re-run it. Nothing else needs touching: the category
+order drives the navigation, the homepage tiles and the index; the featured
+list drives the homepage row and the promoted panel in the Tours menu.
+
+**One thing to know.** The homepage featured row hides itself when no tour is
+flagged. After a fresh `import_packages` nothing is flagged, so the homepage
+shows no tours at all until this command runs. Run it after every re-import.
+
 ## Look and feel
 
-Restrained rather than decorated. Colour comes from the landscape — a deep
-canopy green, dry-grass gold, an ivory paper ground — and the accents are thin
-gold rules, not ornament.
+Restrained rather than decorated. The palette is roasted cocoa against cream,
+with caramel for accents and a single copper for the primary action — warm and
+earthy rather than the green most safari sites reach for.
+
+The tokens in `static/css/style.css` are named for what they are (`--cocoa`,
+`--caramel`, `--copper`, `--cream`), so changing the palette is changing eleven
+values at the top of one file rather than hunting hex codes through the
+stylesheet.
+
+Category colours and the routes-map lines are chosen separately: they have to
+stay apart from one another *and* read against the warm cream ground, which
+rules out anything sandy or gold.
 
 One texture is generated rather than drawn:
 

@@ -93,16 +93,17 @@ class Command(BaseCommand):
         return parts
 
     # ------------------------------------------------------------------ parts
-    # One bead colour per category, drawn from a Maasai beadwork palette.
-    # These carry through to the navigation menu and the category tiles.
-    BEAD_COLOURS = [
-        "#B23A2E",  # red
-        "#2E7D4F",  # green
-        "#2B5DA8",  # blue
-        "#DE8B24",  # orange
-        "#7A4E9C",  # violet
-        "#00767F",  # teal
-        "#17140F",  # black
+    # One colour per category. They appear as short rules beside the category
+    # in the menu, on every tour card and along the bottom of its tile, so they
+    # have to stay apart from each other and read against the cream ground.
+    CATEGORY_COLOURS = [
+        "#9E2B25",  # red
+        "#C2662B",  # burnt orange
+        "#1F6F6B",  # teal
+        "#35497F",  # indigo
+        "#7A3A6B",  # plum
+        "#4E6B22",  # moss
+        "#5A3A26",  # umber
     ]
 
     def _load_categories(self, packages, cat_blocks):
@@ -122,7 +123,7 @@ class Command(BaseCommand):
                     "slug": slug,
                     "code": block.get("code", ""),
                     "description": block.get("description", ""),
-                    "bead_colour": self.BEAD_COLOURS[i % len(self.BEAD_COLOURS)],
+                    "bead_colour": self.CATEGORY_COLOURS[i % len(self.CATEGORY_COLOURS)],
                     "order": i,
                 },
             )

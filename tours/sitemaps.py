@@ -12,6 +12,7 @@ class StaticViewSitemap(Sitemap):
         return [
             "tours:home", "tours:package_list", "tours:category_list",
             "tours:destination_list", "tours:day_trip_list", "tours:transfers",
+            "tours:stay",
             "tours:about", "tours:reviews", "tours:faq", "tours:contact",
         ]
 

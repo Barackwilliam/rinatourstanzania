@@ -1361,3 +1361,94 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   .rate-meta { grid-column: 1 / -1; }
   .rate-price { min-width: 0; }
 }
+
+/* --- Kilimanjaro route map ------------------------------------------------
+   A plan view of the mountain with one route drawn on it. Reads as contour
+   lines: concentric rings darkening towards the Kibo cone, so the route has
+   relief to run across rather than sitting on blank paper. */
+.climb-map-section { margin: 2.4rem 0 1.2rem; }
+.climb-map-section h3 { margin-bottom: .9rem; }
+.climb-map-wrap {
+  background: var(--sand, #F7F2E8);
+  border-radius: 14px;
+  padding: .6rem;
+  overflow: hidden;
+}
+.climb-map { width: 100%; height: auto; display: block; }
+
+.climb-map-relief ellipse {
+  fill: #2E1B12;
+  /* Each ring a little more opaque than the last, so the cone reads as
+     rising ground rather than as a target. */
+  opacity: calc(0.045 + var(--ring, 0) * 0.022);
+  stroke: #2E1B12;
+  stroke-opacity: .10;
+  stroke-width: 1;
+}
+.climb-map-mawenzi, .climb-map-shira { opacity: .10 !important; }
+
+.climb-map-labels text {
+  font-size: 13px;
+  fill: #6B5642;
+  text-anchor: middle;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.climb-map-route {
+  fill: none;
+  stroke: var(--copper, #C2662B);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--len, 1000);
+  stroke-dashoffset: var(--len, 1000);
+}
+.climb-figure.is-drawing .climb-map-route,
+.climb-map-section.is-drawing .climb-map-route {
+  animation: climb-map-draw 1.8s ease-out forwards;
+}
+@keyframes climb-map-draw { to { stroke-dashoffset: 0; } }
+
+.climb-map-camp circle {
+  fill: #FFFDF8;
+  stroke: var(--copper, #C2662B);
+  stroke-width: 2.4;
+}
+.climb-map-camp.is-summit circle {
+  fill: var(--copper, #C2662B);
+  stroke: #FFFDF8;
+  stroke-width: 3;
+}
+/* A camp nobody has confirmed yet gets a dashed ring — quiet, but it means
+   the drawing does not claim more precision than it has. */
+.climb-map-camp.is-approx circle { stroke-dasharray: 3 2.5; }
+
+.climb-map-note {
+  margin-top: .7rem;
+  font-size: .84rem;
+  color: #7A6A58;
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .climb-map-route { stroke-dashoffset: 0; animation: none; }
+}
+
+/* Descent: same colour, dashed and thinner, sitting under the ascent so the
+   climb stays the dominant line where the two cross. */
+.climb-map-descent {
+  fill: none;
+  stroke: var(--copper, #C2662B);
+  stroke-width: 2;
+  stroke-opacity: .55;
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+}
+.climb-map-key {
+  display: flex; align-items: center; gap: .45rem; flex-wrap: wrap;
+  margin-top: .7rem; font-size: .85rem; color: #6B5642;
+}
+.climb-map-key span { display: inline-block; width: 26px; height: 0; margin-right: .2rem; }
+.climb-map-key-up { border-top: 3px solid var(--copper, #C2662B); }
+.climb-map-key-down { border-top: 2px dashed var(--copper, #C2662B); opacity: .6; margin-left: .8rem; }

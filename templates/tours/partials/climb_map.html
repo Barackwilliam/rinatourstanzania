@@ -1,0 +1,83 @@
+{% comment %}
+  A plan view of the mountain with this route drawn on it, gate to summit.
+
+  Sits above the altitude profile: the map answers "which way round do I walk",
+  the profile answers "how steep is it". Someone choosing between Rongai and
+  Machame is asking the first question, and until now the page only answered
+  the second.
+
+  Rendered only when the route has at least two placed camps, so Mount Meru —
+  which is outside this map's box — quietly keeps the profile alone.
+{% endcomment %}
+{% if climb.has_map %}
+<section class="climb-map-section" id="climb-map">
+  <h3>Where {{ climb.name }} goes</h3>
+
+  <div class="climb-map-wrap">
+    <svg class="climb-map" viewBox="{{ climb.map_viewbox }}" role="img"
+         aria-labelledby="climb-map-title climb-map-desc">
+      <title id="climb-map-title">Map of {{ climb.name }} on {{ climb.mountain }}</title>
+      <desc id="climb-map-desc">
+        A plan view of Kilimanjaro showing the Kibo cone, Mawenzi to the east
+        and the Shira plateau to the west. The {{ climb.name }} is drawn from
+        its gate to Uhuru Peak, with every camp marked. The same camps and
+        their altitudes are listed below.
+      </desc>
+
+      {% comment %} Contour rings, faintest and widest first. {% endcomment %}
+      <g class="climb-map-relief">
+        {% for c in map_contours %}
+          <ellipse cx="{{ c.cx }}" cy="{{ c.cy }}" rx="{{ c.rx }}" ry="{{ c.ry }}"
+                   style="--ring:{{ forloop.counter0 }}"/>
+        {% endfor %}
+        <ellipse class="climb-map-mawenzi" cx="{{ map_mawenzi.cx }}" cy="{{ map_mawenzi.cy }}"
+                 rx="{{ map_mawenzi.rx }}" ry="{{ map_mawenzi.ry }}"/>
+        <ellipse class="climb-map-shira" cx="{{ map_shira.cx }}" cy="{{ map_shira.cy }}"
+                 rx="{{ map_shira.rx }}" ry="{{ map_shira.ry }}"/>
+      </g>
+
+      <g class="climb-map-labels">
+        {% for label in map_landmarks %}
+          <text x="{{ label.x }}" y="{{ label.y }}">{{ label.name }}</text>
+        {% endfor %}
+      </g>
+
+      {% comment %} Descent underneath, so the ascent reads on top where they cross. {% endcomment %}
+      {% if climb.map_descent_d %}
+        <path class="climb-map-descent" d="{{ climb.map_descent_d }}"/>
+      {% endif %}
+      <path class="climb-map-route" d="{{ climb.map_path_d }}"
+            style="--len:{{ climb.map_path_length }}"/>
+
+      <g class="climb-map-camps">
+        {% for pt in climb.map_stages %}
+          <g class="climb-map-camp{% if pt.stage == summit %} is-summit{% endif %}{% if not pt.verified %} is-approx{% endif %}"
+             data-camp="{{ forloop.counter0 }}"
+             style="--delay:{{ forloop.counter0 }}90ms">
+            <circle cx="{{ pt.x }}" cy="{{ pt.y }}"
+                    r="{% if pt.stage == summit %}7{% else %}5{% endif %}"/>
+            <title>{{ pt.stage.name }} — {{ pt.stage.altitude_m }} m{% if pt.stage.day %}, day {{ pt.stage.day }}{% endif %}</title>
+          </g>
+        {% endfor %}
+      </g>
+    </svg>
+  </div>
+
+  {% comment %}
+    The honest footnote. It disappears on its own once every camp on this route
+    has been checked by a guide and ticked in the admin — nobody has to
+    remember to come back and delete it.
+  {% endcomment %}
+  <p class="climb-map-key">
+    <span class="climb-map-key-up"></span> the climb
+    {% if climb.map_descent_d %}<span class="climb-map-key-down"></span> the way down{% endif %}
+  </p>
+
+  {% if climb.map_unverified %}
+    <p class="climb-map-note">
+      Camp positions are approximate and drawn for orientation, not navigation.
+      Your guide walks the exact trail.
+    </p>
+  {% endif %}
+</section>
+{% endif %}

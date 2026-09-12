@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ContactForm
 from .data.tanzania_map import OUTLINES, VIEWBOX
+from .data import kilimanjaro_map as kili
 from .models import (
     Accommodation, Category, Destination, FAQ, HeroSlide, MapRoute, Package,
     RouteStop, TeamMember, TransferService, Testimonial,
@@ -132,8 +133,41 @@ def package_detail(request, slug):
         .exclude(pk=package.pk)
         .distinct()[:3]
     )
-    return render(request, "tours/package_detail.html",
-                  {"package": package, "related": related})
+    context = {"package": package, "related": related}
+    if package.climb_route_id:
+        context.update(_kilimanjaro_map_context())
+    return render(request, "tours/package_detail.html", context)
+
+
+def _kilimanjaro_map_context():
+    """
+    Geometry for the plan-view climb map.
+
+    Projected here rather than in the template because Django templates cannot
+    do arithmetic, and rather than in the model because none of it depends on
+    which route is being drawn — it is the same mountain every time.
+    """
+    return {
+        "map_viewbox": kili.VIEWBOX,
+        "map_contours": [
+            dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*c)))
+            for c in kili.CONTOURS
+        ],
+        "map_mawenzi": dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.MAWENZI))),
+        "map_shira": dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.SHIRA_PLATEAU))),
+        "map_landmarks": [
+            {"name": name, "x": kili.project(lon, lat)[0], "y": kili.project(lon, lat)[1]}
+            for name, lon, lat in kili.LANDMARKS
+        ],
+    }
+
+
+def _ellipse(lon, lat, r_lon, r_lat):
+    """Centre plus radii in degrees -> centre plus radii in SVG units."""
+    cx, cy = kili.project(lon, lat)
+    edge_x, _ = kili.project(lon + r_lon, lat)
+    _, edge_y = kili.project(lon, lat + r_lat)
+    return cx, cy, round(abs(edge_x - cx), 1), round(abs(edge_y - cy), 1)
 
 
 def category_list(request):

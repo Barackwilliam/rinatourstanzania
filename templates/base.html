@@ -17,12 +17,12 @@
 
 {% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
 
-{# Our own CSS first and blocking — it is what the page needs to lay out.
+{% comment %} Our own CSS first and blocking — it is what the page needs to lay out.
    Google Fonts follows, but non-blocking: the media="print" trick lets the
    browser fetch it without holding up first paint, then flips it to all once
    it lands. display=swap means text is readable in the fallback face in the
    meantime instead of invisible. On a slow connection this was two extra
-   round trips to a third-party host before anything appeared. #}
+   round trips to a third-party host before anything appeared. {% endcomment %}
 <link rel="stylesheet" href="{% static 'css/motifs.css' %}">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
@@ -318,8 +318,8 @@
   </div>
 </footer>
 
-{# defer: the browser can keep building the page while this downloads, and it
-   runs once the DOM is there. Nothing in main.js needs to run earlier. #}
+{% comment %} defer: the browser can keep building the page while this downloads, and it
+   runs once the DOM is there. Nothing in main.js needs to run earlier. {% endcomment %}
 <script defer src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>

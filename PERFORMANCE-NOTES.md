@@ -198,3 +198,28 @@ lakini faili yenyewe tayari imeshatoka nje ya mashine yako.
   nikifanye.
 - **Ku-compress video yenyewe.** Sijaweka copy iliyobanwa kwa sababu ni
   material ya Akon.
+
+---
+
+## 7. Fix: `{# #}` ya mistari mingi ilikuwa inatoka kama text
+
+Django `{# #}` ni comment ya **mstari mmoja tu**. Comment yoyote inayovuka
+newline haichukuliwi kama comment kabisa — inatoka kama text ya kawaida
+kwenye ukurasa.
+
+Faili zilizoathirika:
+
+- `templates/base.html` — comment yangu ya fonts (ilikuwa inaonekana juu ya
+  header, ndiyo uliyoiona kwenye screenshot)
+- `templates/tours/home.html` — comment yangu ya hero video
+- `templates/tours/partials/route_map.html` — ilikuwepo tangu awali
+- `templates/tours/partials/climb_profile.html` — ilikuwepo tangu awali
+
+Mbili za mwisho zilikuwa kwenye code tangu mwanzo, kabla sijagusa chochote.
+`route_map.html` iko kwenye homepage, kwa hiyo ilikuwa inavuja live.
+
+Zote sasa ni `{% comment %}...{% endcomment %}`. `{# #}` ya mstari mmoja
+imeachwa kama ilivyo — hiyo ni sahihi.
+
+**Kanuni:** `{# #}` mstari mmoja tu. Mistari miwili au zaidi, tumia
+`{% comment %}`.

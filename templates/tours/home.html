@@ -7,13 +7,13 @@
       <div class="hero-slide{% if forloop.first %} is-active{% endif %}" data-slide="{{ forloop.counter0 }}">
         <div class="hero-media-wrap">
           {% if slide.video %}
-            {# The poster shows immediately; the clip itself is fetched by
+            {% comment %} The poster shows immediately; the clip itself is fetched by
                main.js after the page has loaded, and only on a connection that
                can carry it. Previously `autoplay` with no `preload` hint meant
                the browser pulled the whole file down before the visitor saw
                anything — on the hero video currently attached, eighteen
                megabytes of it. `preload="none"` and no `src` attribute are
-               what actually stop that; `data-src` is picked up later. #}
+               what actually stop that; data-hero-video is picked up later. {% endcomment %}
             <video class="hero-media" muted loop playsinline preload="none"
                    data-hero-video="{{ slide.video.url }}"
                    {% if slide.image %}poster="{{ slide.image.url }}"{% endif %}></video>

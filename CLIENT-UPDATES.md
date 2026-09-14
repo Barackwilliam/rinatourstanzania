@@ -325,3 +325,48 @@ Faili: `tours/views.py`, `templates/tours/partials/climb_map.html`,
 ```
 python manage.py collectstatic --no-input
 ```
+
+---
+
+## 9. Logo ya RTZ
+
+Faili moja ya PNG 1254×1254, nimeitengenezea matumizi manne tofauti.
+
+### Kwa nini sikuitumia kama ilivyo
+
+Kwenye header logo ni **40×40px**. `www.rinatourstanzania.com` kwenye
+40px ni mstari wa dhahabu usiosomeka. Kwa hiyo nimeitenganisha:
+
+| Faili | Inatumika wapi |
+|---|---|
+| `rtz-mark-96.png` | Badge ya header — herufi RTZ tu, bila anwani |
+| `rtz-mark-32.png` | Favicon (tab ya browser) |
+| `rtz-mark-192.png` | Apple touch icon — mtu akiweka site kwenye home screen ya simu |
+| `og-image.png` | Picha ya link ikishirikiwa WhatsApp au Facebook |
+
+Ku-crop kulikuwa kwa hatua: swoosh ya dhahabu inaenea pande zote, kwa hiyo
+nikikata kwa mpaka wa rangi ya dhahabu herufi zinakuwa ndogo mno ndani ya
+mraba. Nimekata kwa **msongamano** wa dhahabu — herufi ni nene, swoosh ni
+utepe mwembamba — na kwa kuzuia eneo la anwani chini.
+
+### Badge sasa ni mraba wenye pembe za mviringo, si duara
+
+Herufi RTZ zinaenea karibu upana wote wa mchoro. Duara lingekata R na Z.
+Rangi ya nyuma ya logo ni ile ile ya kahawia (`--cocoa`) iliyokuwa kwenye
+duara la zamani, kwa hiyo bado inaonekana sehemu ya header.
+
+### Favicon na og:image hazikuwepo kabisa
+
+Site ilikuwa **haina favicon** — tab ya browser ilionyesha ikoni tupu. Na
+ilikuwa haina `og:image`, kwa hiyo link ikishirikiwa WhatsApp ilionekana
+kadi tupu. Kwa kuwa maulizo mengi ya Rina yanaanzia WhatsApp, hilo lilikuwa
+linagharimu.
+
+Ukurasa wenye picha yake mwenyewe unaweza kubadilisha `og_image`; mwingine
+wote unarudi kwenye logo.
+
+Baada ya copy:
+
+```
+python manage.py collectstatic --no-input
+```

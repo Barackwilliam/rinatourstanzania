@@ -12,8 +12,22 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
 <meta property="og:description" content="{% block og_description %}Safaris, treks and beach holidays across Tanzania.{% endblock %}">
-{% block og_image %}{% endblock %}
+{% comment %}
+  A page with its own photograph overrides og_image; everything else falls
+  back to the logo, so a link shared on WhatsApp is never a blank card.
+  WhatsApp is where most of Rina's enquiries start.
+{% endcomment %}
+{% block og_image %}
+  <meta property="og:image" content="{{ SITE_DOMAIN }}{% static 'img/brand/og-image.png' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+{% endblock %}
 <meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/rtz-mark-32.png' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/brand/rtz-mark-192.png' %}">
+<link rel="apple-touch-icon" href="{% static 'img/brand/rtz-mark-192.png' %}">
+<meta name="theme-color" content="#2E1B12">
 
 {% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
 
@@ -79,7 +93,8 @@
   <div class="container header-inner">
 
     <a class="brand" href="{% url 'tours:home' %}">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <img class="brand-mark" src="{% static 'img/brand/rtz-mark-96.png' %}"
+           alt="" width="40" height="40" fetchpriority="high" decoding="async">
       <span class="brand-text">
         <span class="brand-name">{{ SITE_NAME }}</span>
         <span class="brand-tagline">{% if SITE_TAGLINE %}{{ SITE_TAGLINE }}{% else %}Tanzania, at your pace{% endif %}</span>

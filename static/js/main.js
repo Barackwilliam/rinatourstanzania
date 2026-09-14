@@ -396,31 +396,6 @@
     });
   }
 
-  /* --- Header shrink ----------------------------------------------------
-     The logo opens large enough for the web address printed in it to be
-     read. That is more sticky header than a long page should carry, so past
-     the first screen it steps down.
-
-     The large size is the stylesheet default and this only ever adds a class,
-     so if the script never runs the visitor keeps a readable logo and loses
-     nothing else. */
-  var siteHeader = document.querySelector('.site-header');
-  if (siteHeader) {
-    var compactAt = 140;
-    var ticking = false;
-
-    function syncHeader() {
-      siteHeader.classList.toggle('is-compact', window.scrollY > compactAt);
-      ticking = false;
-    }
-    window.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(syncHeader);
-    }, { passive: true });
-    syncHeader();
-  }
-
   /* --- Climb route map --------------------------------------------------
      The route is drawn in full in the stylesheet. Here we opt into the
      draw-on animation: add .is-ready to dash the line, then .is-drawing on

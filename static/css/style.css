@@ -132,30 +132,31 @@ h3 { font-size: 1.18rem; }
    default and the shrink is added by script, so a failed script costs the
    shrink, never the legibility. */
 .brand-mark {
-  width: 128px; height: 128px; flex: none;
+  width: 168px; height: 168px; flex: none;
   border-radius: 6px;
   transition: width .22s ease, height .22s ease;
 }
 .header-inner {
-  min-height: 152px;
+  min-height: 190px;
   transition: min-height .22s ease;
 }
 
-/* Once the page has scrolled past the first screen the visitor has already
-   read the logo, so it steps down to something a sticky bar can carry. */
-.site-header.is-compact .brand-mark { width: 60px; height: 60px; }
-.site-header.is-compact .header-inner { min-height: 84px; }
+/* The project already shrinks the header on scroll, via .is-stuck. My first
+   attempt added a second mechanism (.is-compact) alongside it, and the two
+   fought: .is-stuck squeezed the bar to 66px without touching the logo, so a
+   128px mark was crushed inside a 66px header. One mechanism only — the logo
+   shrinks with the bar it sits in. */
+.site-header.is-stuck .brand-mark { width: 64px; height: 64px; }
 
 @media (max-width: 760px) {
-  .brand-mark { width: 104px; height: 104px; }
-  .header-inner { min-height: 124px; }
+  .brand-mark { width: 132px; height: 132px; }
+  .header-inner { min-height: 154px; }
   /* The logo carries the company name itself, so the tagline steps aside
      rather than squeezing the mark. */
   .brand-tagline { display: none; }
   .brand-name { font-size: 1.1rem; }
   .brand { gap: 10px; }
-  .site-header.is-compact .brand-mark { width: 52px; height: 52px; }
-  .site-header.is-compact .header-inner { min-height: 70px; }
+  .site-header.is-stuck .brand-mark { width: 56px; height: 56px; }
 }
 
 @media (max-width: 420px) {
@@ -1058,7 +1059,7 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   background: rgba(251,248,242,.94);
   backdrop-filter: saturate(140%) blur(8px);
 }
-.site-header.is-stuck .header-inner { min-height: 66px; }
+.site-header.is-stuck .header-inner { min-height: 82px; }
 .header-inner { transition: min-height .25s ease; }
 
 /* Cards lift on hover and the photograph pushes in slightly behind the frame. */
@@ -1578,16 +1579,24 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 }
 
 /* --- WhatsApp glyph beside a number or link ----------------------------- */
+/* Small — a marker beside the number, not a button. The green is set on the
+   SVG path itself, so it survives whatever colour the surrounding link is. */
 .wa-icon {
-  width: 1.05em; height: 1.05em;
+  width: .82em; height: .82em;
   flex: none;
-  vertical-align: -.17em;
-  margin-right: .38em;
-  /* WhatsApp's own green, so the icon is recognised at a glance even where
-     the surrounding text is brown or cream. */
-  color: #25D366;
+  vertical-align: -.08em;
+  margin-right: .34em;
 }
 a.has-wa { display: inline-flex; align-items: center; }
-/* Inside the dark footer the green still reads; on the cream CTA band it can
-   look thin, so it gets a touch more weight there. */
-.cta-contacts .wa-icon { width: 1.15em; height: 1.15em; }
+
+/* Distinguishes the two numbers. One is WhatsApp, the other takes ordinary
+   calls only — without saying so, an overseas visitor tries WhatsApp on the
+   landline number and concludes nobody is answering. */
+.contact-kind {
+  display: inline-block;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  opacity: .62;
+  white-space: nowrap;
+}
+.cta-contacts .contact-kind { display: block; margin-top: .1rem; }

@@ -93,8 +93,8 @@
   <div class="container header-inner">
 
     <a class="brand" href="{% url 'tours:home' %}">
-      <img class="brand-mark" src="{% static 'img/brand/rtz-logo-256.png' %}"
-           alt="" width="128" height="128" fetchpriority="high" decoding="async">
+      <img class="brand-mark" src="{% static 'img/brand/rtz-logo-512.png' %}"
+           alt="" width="168" height="168" fetchpriority="high" decoding="async">
       <span class="brand-text">
         <span class="brand-name">{{ SITE_NAME }}</span>
         <span class="brand-tagline">{% if SITE_TAGLINE %}{{ SITE_TAGLINE }}{% else %}Tanzania, at your pace{% endif %}</span>
@@ -303,7 +303,7 @@
     <div>
       <p class="footer-heading">Get in touch</p>
       <ul class="footer-links">
-        {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a></li>{% endif %}
+        {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a> <span class="contact-kind">local line, calls only</span></li>{% endif %}
         {% if SITE_PHONE_SECONDARY %}<li><a href="tel:{{ SITE_PHONE_SECONDARY|cut:' ' }}">{{ SITE_PHONE_SECONDARY }}</a></li>{% endif %}
         {% if SITE_EMAIL %}<li><a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a></li>{% endif %}
         {% if SITE_EMAIL_SECONDARY %}<li><a href="mailto:{{ SITE_EMAIL_SECONDARY }}">{{ SITE_EMAIL_SECONDARY }}</a></li>{% endif %}

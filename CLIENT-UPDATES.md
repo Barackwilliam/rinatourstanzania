@@ -447,3 +447,50 @@ Baada ya copy:
 ```
 python manage.py collectstatic --no-input
 ```
+
+---
+
+## 11. Logo kubwa zaidi, WhatsApp green, namba ya simu
+
+### Kwa nini logo ilikuwa bado ndogo
+
+Si kwamba ukubwa haukuwekwa. Project **ilikuwa tayari na mfumo wa kupunguza
+header** — class `is-stuck`, ikibana header hadi 66px ukisogeza chini. Mimi
+nikaongeza mfumo wa pili (`is-compact`) bila kuuona. Zikagongana: `is-stuck`
+ilibana bar hadi 66px **bila kugusa logo**, kwa hiyo logo ya 128px ilikuwa
+inabanwa ndani ya nafasi ya 66px.
+
+Sasa kuna mfumo mmoja tu. Nimeondoa `is-compact` yangu na JS yake, na
+nikaongeza ukubwa wa logo kwenye `is-stuck` iliyokuwepo. Header ya `is-stuck`
+sasa ni 82px badala ya 66px ili logo iliyopungua itoshee.
+
+### Ukubwa mpya
+
+| | Mwanzoni | Ukisogeza chini |
+|---|---|---|
+| Laptop | **168px** | 64px |
+| Simu | **132px** | 56px |
+
+Anwani `www.rinatourstanzania.com` inasomeka vizuri kwa vipimo vyote viwili.
+
+### WhatsApp icon
+
+- Kijani `#25D366` sasa kimeandikwa **ndani ya SVG path yenyewe**, si kupitia
+  CSS. Ilikuwa `fill="currentColor"` ikitegemea rule ya CSS kuifikia — na
+  rule ya CSS inayoweza kutofika ndilo tatizo lililotufanya map ya mlima iwe
+  doa jeusi. Rangi yenye maana haipaswi kutegemea stylesheet
+- Ndogo: `0.82em`, ni alama pembeni ya namba, si kitufe
+
+### Namba mbili zinatofautishwa
+
+- **0767 753 553** — WhatsApp, yenye icon ya kijani
+- **+255 681 965 636** — sasa ina maandishi madogo *"local line, calls only"*
+
+Bila hivyo mgeni wa nje anajaribu WhatsApp kwenye namba ya simu ya kawaida,
+haipokelewi, anadhani hakuna anayejibu.
+
+Baada ya copy:
+
+```
+python manage.py collectstatic --no-input
+```

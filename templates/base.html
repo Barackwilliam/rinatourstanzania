@@ -24,9 +24,9 @@
 {% endblock %}
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/rtz-mark-32.png' %}">
-<link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/brand/rtz-mark-192.png' %}">
-<link rel="apple-touch-icon" href="{% static 'img/brand/rtz-mark-192.png' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/rtz-logo-32.png' %}">
+<link rel="icon" type="image/png" sizes="180x180" href="{% static 'img/brand/rtz-logo-180.png' %}">
+<link rel="apple-touch-icon" href="{% static 'img/brand/rtz-logo-180.png' %}">
 <meta name="theme-color" content="#2E1B12">
 
 {% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
@@ -93,8 +93,8 @@
   <div class="container header-inner">
 
     <a class="brand" href="{% url 'tours:home' %}">
-      <img class="brand-mark" src="{% static 'img/brand/rtz-mark-96.png' %}"
-           alt="" width="40" height="40" fetchpriority="high" decoding="async">
+      <img class="brand-mark" src="{% static 'img/brand/rtz-logo-128.png' %}"
+           alt="" width="64" height="64" fetchpriority="high" decoding="async">
       <span class="brand-text">
         <span class="brand-name">{{ SITE_NAME }}</span>
         <span class="brand-tagline">{% if SITE_TAGLINE %}{{ SITE_TAGLINE }}{% else %}Tanzania, at your pace{% endif %}</span>

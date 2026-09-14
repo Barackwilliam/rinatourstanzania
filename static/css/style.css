@@ -115,18 +115,30 @@ h3 { font-size: 1.18rem; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 78px; }
 
 .brand { text-decoration: none; display: flex; align-items: center; gap: 12px; }
-/* The RTZ badge. A rounded square rather than the circle the CSS mark used to
-   draw: the lettering runs nearly the full width of the artwork, so a circular
-   crop clipped the R and the Z. The logo's own background is the same cocoa
-   the circle was, so it still reads as part of the header. */
+/* The RTZ logo, shown whole and unaltered.
+
+   An earlier version cropped it down to the letters so it would read at 40px.
+   That made the badge legible and the logo wrong: the web address and the
+   flourish are part of the mark its owner drew, and trimming them is a brand
+   decision that is not ours to take. Shown complete, it needs room — hence 64px
+   here rather than the 40px the old CSS circle used, and a taller header to
+   carry it.
+
+   No border-radius: the artwork already has its own square edge. */
 .brand-mark {
-  width: 40px; height: 40px; flex: none;
-  border-radius: 9px;
-  object-fit: cover;
-  box-shadow: 0 0 0 1px var(--line);
+  width: 64px; height: 64px; flex: none;
+  border-radius: 6px;
 }
+.header-inner { min-height: 92px; }
+
 @media (max-width: 560px) {
-  .brand-mark { width: 34px; height: 34px; border-radius: 8px; }
+  /* Still 52px on a phone — big enough to read the letters. The tagline steps
+     aside to pay for it; the logo carries the name anyway. */
+  .brand-mark { width: 52px; height: 52px; }
+  .header-inner { min-height: 76px; }
+  .brand-tagline { display: none; }
+  .brand-name { font-size: 1.12rem; }
+  .brand { gap: 9px; }
 }
 .brand-text { display: flex; flex-direction: column; }
 .brand-name { font-family: var(--font-display); font-size: 1.3rem; color: var(--cocoa); line-height: 1.1; }

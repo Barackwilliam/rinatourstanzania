@@ -330,40 +330,48 @@ python manage.py collectstatic --no-input
 
 ## 9. Logo ya RTZ
 
-Faili moja ya PNG 1254×1254, nimeitengenezea matumizi manne tofauti.
-
-### Kwa nini sikuitumia kama ilivyo
-
-Kwenye header logo ni **40×40px**. `www.rinatourstanzania.com` kwenye
-40px ni mstari wa dhahabu usiosomeka. Kwa hiyo nimeitenganisha:
+Logo inatumika **kama walivyoitoa** — imepunguzwa ukubwa tu, haijakatwa wala
+kubadilishwa.
 
 | Faili | Inatumika wapi |
 |---|---|
-| `rtz-mark-96.png` | Badge ya header — herufi RTZ tu, bila anwani |
-| `rtz-mark-32.png` | Favicon (tab ya browser) |
-| `rtz-mark-192.png` | Apple touch icon — mtu akiweka site kwenye home screen ya simu |
-| `og-image.png` | Picha ya link ikishirikiwa WhatsApp au Facebook |
+| `rtz-logo-128.png` | Header (64px desktop, 52px simu) |
+| `rtz-logo-32.png` | Favicon |
+| `rtz-logo-180.png` | Apple touch icon |
+| `og-image.png` | Link ikishirikiwa WhatsApp au Facebook |
 
-Ku-crop kulikuwa kwa hatua: swoosh ya dhahabu inaenea pande zote, kwa hiyo
-nikikata kwa mpaka wa rangi ya dhahabu herufi zinakuwa ndogo mno ndani ya
-mraba. Nimekata kwa **msongamano** wa dhahabu — herufi ni nene, swoosh ni
-utepe mwembamba — na kwa kuzuia eneo la anwani chini.
+### Nilichokosea mara ya kwanza
 
-### Badge sasa ni mraba wenye pembe za mviringo, si duara
+Nilikuwa nimeikata logo — nikaondoa `www.rinatourstanzania.com` na swoosh —
+ili herufi RTZ zisomeke kwenye badge ya 40px. Ilifanya badge isomeke na
+**ikaharibu logo**. Anwani ya tovuti na swoosh ni sehemu ya mchoro aliouchora
+mwenye brand. Kuamua kuziondoa ni uamuzi wa brand, si wa developer. Mwenye
+website alikuwa sahihi kulalamika.
 
-Herufi RTZ zinaenea karibu upana wote wa mchoro. Duara lingekata R na Z.
-Rangi ya nyuma ya logo ni ile ile ya kahawia (`--cocoa`) iliyokuwa kwenye
-duara la zamani, kwa hiyo bado inaonekana sehemu ya header.
+Njia sahihi ilikuwa kuipa logo nafasi, si kuikata ili itoshee nafasi ndogo.
+
+### Ukubwa
+
+Badge la zamani lilikuwa 40px — dogo mno kwa logo yenye maandishi ndani yake.
+Sasa:
+
+- **Desktop:** 64px, header imeongezwa hadi 92px ili iitoshee
+- **Simu:** 52px, header 76px. Tagline "Tanzania, at your pace" inajificha
+  kwenye simu ili kutoa nafasi — logo na jina zinatosha hapo
+
+Hakuna `border-radius` kubwa — mchoro tayari una ukingo wake wa mraba.
 
 ### Favicon na og:image hazikuwepo kabisa
 
-Site ilikuwa **haina favicon** — tab ya browser ilionyesha ikoni tupu. Na
-ilikuwa haina `og:image`, kwa hiyo link ikishirikiwa WhatsApp ilionekana
-kadi tupu. Kwa kuwa maulizo mengi ya Rina yanaanzia WhatsApp, hilo lilikuwa
-linagharimu.
+Site ilikuwa **haina favicon** — tab ya browser ilionyesha ikoni tupu — na
+haina `og:image`, kwa hiyo link ikishirikiwa WhatsApp ilionekana kadi tupu.
+Kwa kuwa maulizo mengi ya Rina yanaanzia WhatsApp, hilo lilikuwa linagharimu.
 
-Ukurasa wenye picha yake mwenyewe unaweza kubadilisha `og_image`; mwingine
-wote unarudi kwenye logo.
+Kwenye favicon ya 32px anwani ya tovuti haisomeki — ni logo nzima
+iliyopunguzwa, kwa hiyo herufi RTZ zinaonekana na anwani inakuwa mstari wa
+dhahabu. Hiyo ni kawaida kwa favicon yoyote yenye maandishi. Kama mwenye
+brand anapendelea ikoni ya herufi tu kwenye 32px, aniambie — lakini
+sitaikata tena bila yeye kusema.
 
 Baada ya copy:
 

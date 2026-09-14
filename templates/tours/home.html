@@ -250,7 +250,7 @@
       {% if SITE_WHATSAPP %}
         <li>
           <span class="cta-contact-label">WhatsApp</span>
-          <a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">
+          <a class="has-wa" href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">{% include "tours/partials/whatsapp_icon.html" %}
             {{ SITE_WHATSAPP_DISPLAY|default:SITE_WHATSAPP }}</a>
         </li>
       {% endif %}

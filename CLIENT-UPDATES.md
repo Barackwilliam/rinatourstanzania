@@ -378,3 +378,72 @@ Baada ya copy:
 ```
 python manage.py collectstatic --no-input
 ```
+
+---
+
+## 10. Logo kubwa, WhatsApp icon, bei mpya
+
+### Logo — ukubwa umepimwa, si kukisiwa
+
+Nilirender logo kwa ukubwa tofauti nikaangalia ni wapi
+`www.rinatourstanzania.com` inaanza kusomeka:
+
+| Ukubwa | Anwani |
+|---|---|
+| 64px | haisomeki |
+| 96px | mstari wa dhahabu |
+| **112px** | inasomeka |
+| **128px** | wazi kabisa |
+
+Kwa hiyo: **128px laptop, 104px simu.**
+
+Lakini 128px ya sticky header ni kubwa mno kubeba ukurasa mzima — kwenye simu
+ingekula robo ya skrini kila wakati. Kwa hiyo logo **inapungua ukisogeza
+chini**: 128px mwanzoni ambapo mtu anaisoma, 60px baada ya kupita skrini ya
+kwanza.
+
+Ukubwa mkubwa ndio default ya CSS; JS inaongeza tu class ya kupunguza. Script
+ikishindwa kufanya kazi, mtumiaji anabaki na logo inayosomeka — hapotezi
+kitu. (Hii ndiyo kanuni ile ile iliyoshindikana kwenye map ya mlima.)
+
+Kwenye simu chini ya 420px, jina linakuwa "Rina Tours" badala ya "Rina Tours
+Tanzania" — logo na jina kamili haviwezi kutoshea, na logo ndiyo yenye anwani.
+
+### WhatsApp icon
+
+Icon ya WhatsApp sasa iko pembeni ya namba kila mahali inapoonekana: header
+bar, footer, contact page na homepage. Ni SVG iliyoandikwa ndani ya HTML —
+haina request ya ziada, na ina rangi ya kijani ya WhatsApp (`#25D366`) ili
+itambulike papo hapo.
+
+Namba **0767 753 553** ndiyo ya WhatsApp — ndiyo iliyo kwenye
+`SITE_WHATSAPP_DISPLAY`, na link inaenda `wa.me/255767753553`.
+
+### Bei
+
+```
+python manage.py set_stay_price --apply
+python manage.py restore_climb_prices --apply
+python manage.py set_climb_price --price 1846 --apply
+```
+
+Accommodation: $60 -> **$80** kwa mtu.
+
+Kilimanjaro: **floor ya $1846**. Lazima urun `restore_climb_prices` kwanza —
+bei zilikuwa zote $1746 baada ya `--flat`, kwa hiyo floor ingeziweka zote
+$1846 na kupoteza tofauti ya urefu tena. Baada ya restore:
+
+| Route | Siku | Bei |
+|---|---|---|
+| Marangu, Machame, Umbwe | 6 | $1,846 |
+| Machame 7, Rongai, Lemosho | 7 | $1,846 |
+| Lemosho 8 | 8 | $2,000 |
+| Northern Circuit | 9 | $2,200 |
+
+Bei ya chini kabisa ni $1,846, na ndefu zinabaki juu yake.
+
+Baada ya copy:
+
+```
+python manage.py collectstatic --no-input
+```

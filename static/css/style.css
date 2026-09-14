@@ -117,32 +117,61 @@ h3 { font-size: 1.18rem; }
 .brand { text-decoration: none; display: flex; align-items: center; gap: 12px; }
 /* The RTZ logo, shown whole and unaltered.
 
-   An earlier version cropped it down to the letters so it would read at 40px.
-   That made the badge legible and the logo wrong: the web address and the
-   flourish are part of the mark its owner drew, and trimming them is a brand
-   decision that is not ours to take. Shown complete, it needs room — hence 64px
-   here rather than the 40px the old CSS circle used, and a taller header to
-   carry it.
+   An earlier version cropped it to the letters so it would read at 40px. That
+   made the badge legible and the logo wrong: the web address and the flourish
+   are part of the mark its owner drew, and trimming them is a brand decision
+   that is not a developer's to take.
 
-   No border-radius: the artwork already has its own square edge. */
+   Size is set by what the address actually needs. Rendered and measured: below
+   96px `www.rinatourstanzania.com` is a gold smear, at 112px it reads, at
+   128px it is comfortable. So the header opens at 128px on a laptop and 104px
+   on a phone.
+
+   That is a lot of sticky header to carry down a long page, so it shrinks once
+   you scroll — see .site-header.is-compact below. The large size is the
+   default and the shrink is added by script, so a failed script costs the
+   shrink, never the legibility. */
 .brand-mark {
-  width: 64px; height: 64px; flex: none;
+  width: 128px; height: 128px; flex: none;
   border-radius: 6px;
+  transition: width .22s ease, height .22s ease;
 }
-.header-inner { min-height: 92px; }
+.header-inner {
+  min-height: 152px;
+  transition: min-height .22s ease;
+}
 
-@media (max-width: 560px) {
-  /* Still 52px on a phone — big enough to read the letters. The tagline steps
-     aside to pay for it; the logo carries the name anyway. */
-  .brand-mark { width: 52px; height: 52px; }
-  .header-inner { min-height: 76px; }
+/* Once the page has scrolled past the first screen the visitor has already
+   read the logo, so it steps down to something a sticky bar can carry. */
+.site-header.is-compact .brand-mark { width: 60px; height: 60px; }
+.site-header.is-compact .header-inner { min-height: 84px; }
+
+@media (max-width: 760px) {
+  .brand-mark { width: 104px; height: 104px; }
+  .header-inner { min-height: 124px; }
+  /* The logo carries the company name itself, so the tagline steps aside
+     rather than squeezing the mark. */
   .brand-tagline { display: none; }
-  .brand-name { font-size: 1.12rem; }
-  .brand { gap: 9px; }
+  .brand-name { font-size: 1.1rem; }
+  .brand { gap: 10px; }
+  .site-header.is-compact .brand-mark { width: 52px; height: 52px; }
+  .site-header.is-compact .header-inner { min-height: 70px; }
 }
-.brand-text { display: flex; flex-direction: column; }
-.brand-name { font-family: var(--font-display); font-size: 1.3rem; color: var(--cocoa); line-height: 1.1; }
-.brand-tagline { font-size: .76rem; color: var(--ink-soft); }
+
+@media (max-width: 420px) {
+  /* Below this the logo and the wordmark cannot both fit, and the logo is the
+     one that carries the address. */
+  .brand-name { font-size: 0; }
+  .brand-name::after {
+    content: "Rina Tours";
+    font-size: 1rem;
+    font-family: var(--font-display);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark, .header-inner { transition: none; }
+}
 
 /* ---- burger + scrim (pure CSS, so the drawer opens with no JS) ---- */
 .nav-toggle { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -1547,3 +1576,18 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   .stay-band-image { max-height: 260px; }
   .cta-contacts { gap: 1rem 1.6rem; }
 }
+
+/* --- WhatsApp glyph beside a number or link ----------------------------- */
+.wa-icon {
+  width: 1.05em; height: 1.05em;
+  flex: none;
+  vertical-align: -.17em;
+  margin-right: .38em;
+  /* WhatsApp's own green, so the icon is recognised at a glance even where
+     the surrounding text is brown or cream. */
+  color: #25D366;
+}
+a.has-wa { display: inline-flex; align-items: center; }
+/* Inside the dark footer the green still reads; on the cream CTA band it can
+   look thin, so it gets a touch more weight there. */
+.cta-contacts .wa-icon { width: 1.15em; height: 1.15em; }

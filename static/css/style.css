@@ -115,64 +115,21 @@ h3 { font-size: 1.18rem; }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 78px; }
 
 .brand { text-decoration: none; display: flex; align-items: center; gap: 12px; }
-/* The RTZ logo, shown whole and unaltered.
-
-   An earlier version cropped it to the letters so it would read at 40px. That
-   made the badge legible and the logo wrong: the web address and the flourish
-   are part of the mark its owner drew, and trimming them is a brand decision
-   that is not a developer's to take.
-
-   Size is set by what the address actually needs. Rendered and measured: below
-   96px `www.rinatourstanzania.com` is a gold smear, at 112px it reads, at
-   128px it is comfortable. So the header opens at 128px on a laptop and 104px
-   on a phone.
-
-   That is a lot of sticky header to carry down a long page, so it shrinks once
-   you scroll — see .site-header.is-compact below. The large size is the
-   default and the shrink is added by script, so a failed script costs the
-   shrink, never the legibility. */
 .brand-mark {
-  width: 168px; height: 168px; flex: none;
-  border-radius: 6px;
-  transition: width .22s ease, height .22s ease;
+  width: 40px; height: 40px; flex: none; border-radius: 50%;
+  background: var(--cocoa);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 0 1px var(--line);
+  position: relative;
 }
-.header-inner {
-  min-height: 190px;
-  transition: min-height .22s ease;
+.brand-mark::after {
+  content: ''; position: absolute; inset: 9px;
+  border: 1.5px solid var(--caramel); border-radius: 50%;
+  border-bottom-color: transparent;
+  transform: rotate(-35deg);
 }
-
-/* The project already shrinks the header on scroll, via .is-stuck. My first
-   attempt added a second mechanism (.is-compact) alongside it, and the two
-   fought: .is-stuck squeezed the bar to 66px without touching the logo, so a
-   128px mark was crushed inside a 66px header. One mechanism only — the logo
-   shrinks with the bar it sits in. */
-.site-header.is-stuck .brand-mark { width: 64px; height: 64px; }
-
-@media (max-width: 760px) {
-  .brand-mark { width: 132px; height: 132px; }
-  .header-inner { min-height: 154px; }
-  /* The logo carries the company name itself, so the tagline steps aside
-     rather than squeezing the mark. */
-  .brand-tagline { display: none; }
-  .brand-name { font-size: 1.1rem; }
-  .brand { gap: 10px; }
-  .site-header.is-stuck .brand-mark { width: 56px; height: 56px; }
-}
-
-@media (max-width: 420px) {
-  /* Below this the logo and the wordmark cannot both fit, and the logo is the
-     one that carries the address. */
-  .brand-name { font-size: 0; }
-  .brand-name::after {
-    content: "Rina Tours";
-    font-size: 1rem;
-    font-family: var(--font-display);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brand-mark, .header-inner { transition: none; }
-}
+.brand-text { display: flex; flex-direction: column; }
+.brand-name { font-family: var(--font-display); font-size: 1.3rem; color: var(--cocoa); line-height: 1.1; }
+.brand-tagline { font-size: .76rem; color: var(--ink-soft); }
 
 /* ---- burger + scrim (pure CSS, so the drawer opens with no JS) ---- */
 .nav-toggle { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -344,20 +301,6 @@ h3 { font-size: 1.18rem; }
 .hero-slide.is-active .hero-media {
   animation: hero-drift 16s ease-out forwards;
 }
-
-/* Where a slide has a video, the poster is a real <img> stacked on top of it
-   rather than the <video poster> attribute. A poster attribute only paints
-   once the element has decided it has no frames, which on a slow connection is
-   a beat of empty box; an image painted normally is there at first paint. The
-   video is revealed underneath only when it can play through, so a clip that
-   never arrives costs nothing and a clip that does arrive never flashes. */
-.hero-media-poster {
-  position: absolute; inset: 0;
-  transition: opacity .6s ease;
-}
-.hero-media-poster.is-hidden { opacity: 0; pointer-events: none; }
-video.hero-media:not(.is-ready) { opacity: 0; }
-video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 @keyframes hero-drift {
   from { transform: scale(1.06) translate3d(0, 0, 0); }
   to   { transform: scale(1.14) translate3d(-1.4%, -1.2%, 0); }
@@ -1051,16 +994,15 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
 [data-reveal][data-reveal-delay="2"] { transition-delay: .14s; }
 [data-reveal][data-reveal-delay="3"] { transition-delay: .21s; }
 
-/* The header thins out once the page scrolls, giving the content more room
-   without the nav ever leaving. */
+/* Once the page scrolls the header lifts off it with a shadow and a light
+   blur. Its height stays fixed: shrinking it nudged the logo on every scroll,
+   which read as the mark resizing itself. */
 .site-header { transition: box-shadow .25s ease, background-color .25s ease; }
 .site-header.is-stuck {
   box-shadow: 0 14px 30px -26px rgba(34,21,14,.6);
-  background: rgba(251,248,242,.94);
+  background: rgba(252,247,241,.94);
   backdrop-filter: saturate(140%) blur(8px);
 }
-.site-header.is-stuck .header-inner { min-height: 82px; }
-.header-inner { transition: min-height .25s ease; }
 
 /* Cards lift on hover and the photograph pushes in slightly behind the frame. */
 .tour-card {
@@ -1404,199 +1346,3 @@ video.hero-media.is-ready { opacity: 1; transition: opacity .6s ease; }
   .rate-meta { grid-column: 1 / -1; }
   .rate-price { min-width: 0; }
 }
-
-/* --- Kilimanjaro route map ------------------------------------------------
-   A plan view of the mountain with one route drawn on it. Reads as contour
-   lines: concentric rings darkening towards the Kibo cone, so the route has
-   relief to run across rather than sitting on blank paper. */
-.climb-map-section { margin: 2.4rem 0 1.2rem; }
-.climb-map-section h3 { margin-bottom: .9rem; }
-.climb-map-wrap {
-  background: var(--sand, #F7F2E8);
-  border-radius: 14px;
-  padding: .6rem;
-  overflow: hidden;
-}
-.climb-map { width: 100%; height: auto; display: block; }
-
-/* Relief fill and opacity are written onto each ellipse as SVG attributes by
-   the view, not set here. They were a CSS calc() over a custom property, and
-   in a browser that did not parse it the opacity fell back to 1 — seven rings
-   of near-black stacked on each other, and the map rendered as a solid blob.
-   Anything that must be visible for the drawing to make sense now lives in
-   the markup; only decoration lives in this file. */
-
-.climb-map-labels text {
-  font-size: 13px;
-  fill: #6B5642;
-  text-anchor: middle;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-/* The route is drawn in full by default. The draw-on animation is added only
-   once the section is in view, by JavaScript.
-
-   It used to be the other way round — the line shipped fully dash-offset and
-   waited for an .is-drawing class. Nothing ever added that class to this
-   section, only to the altitude profile below it, so the route was invisible
-   on every climb page. Making the visible state the default means a missing
-   class, a failed script or an old browser costs the animation, never the
-   drawing itself. */
-.climb-map-route {
-  fill: none;
-  stroke: var(--copper, #C2662B);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.climb-map-section.is-ready .climb-map-route {
-  stroke-dasharray: var(--len, 1000);
-  stroke-dashoffset: var(--len, 1000);
-}
-.climb-map-section.is-drawing .climb-map-route {
-  animation: climb-map-draw 1.8s ease-out forwards;
-}
-@keyframes climb-map-draw { to { stroke-dashoffset: 0; } }
-
-.climb-map-camp circle {
-  fill: #FFFDF8;
-  stroke: var(--copper, #C2662B);
-  stroke-width: 2.4;
-}
-.climb-map-camp.is-summit circle {
-  fill: var(--copper, #C2662B);
-  stroke: #FFFDF8;
-  stroke-width: 3;
-}
-/* A camp nobody has confirmed yet gets a dashed ring — quiet, but it means
-   the drawing does not claim more precision than it has. */
-.climb-map-camp.is-approx circle { stroke-dasharray: 3 2.5; }
-
-.climb-map-note {
-  margin-top: .7rem;
-  font-size: .84rem;
-  color: #7A6A58;
-  font-style: italic;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .climb-map-route { stroke-dashoffset: 0; animation: none; }
-}
-
-/* Descent: same colour, dashed and thinner, sitting under the ascent so the
-   climb stays the dominant line where the two cross. */
-.climb-map-descent {
-  fill: none;
-  stroke: var(--copper, #C2662B);
-  stroke-width: 2;
-  stroke-opacity: .55;
-  stroke-dasharray: 7 6;
-  stroke-linecap: round;
-}
-.climb-map-key {
-  display: flex; align-items: center; gap: .45rem; flex-wrap: wrap;
-  margin-top: .7rem; font-size: .85rem; color: #6B5642;
-}
-.climb-map-key span {
-  display: inline-block;
-  width: 26px;
-  margin-right: .3rem;
-  vertical-align: middle;
-}
-/* Real height and a background rather than a border on a zero-height box:
-   the swatches were invisible on the phone. */
-.climb-map-key-up { height: 3px; background: var(--copper, #C2662B); border-radius: 2px; }
-.climb-map-key-down {
-  height: 0; border-top: 2px dashed var(--copper, #C2662B);
-  opacity: .65; margin-left: .9rem;
-}
-
-/* --- Contact details in the homepage CTA band --------------------------- */
-.cta-contacts {
-  list-style: none;
-  margin: 1.6rem 0 1.8rem;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.1rem 2.4rem;
-}
-.cta-contacts li { display: flex; flex-direction: column; gap: .15rem; }
-.cta-contact-label {
-  font-size: .72rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  opacity: .62;
-}
-.cta-contacts a {
-  font-size: 1.06rem;
-  font-weight: 500;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 1px;
-}
-.cta-contacts a:hover { opacity: .75; }
-
-/* --- Guest house band on the homepage ----------------------------------- */
-.stay-band {
-  display: grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap: 2.6rem;
-  align-items: center;
-}
-.stay-band-copy h2 { margin-bottom: .7rem; }
-.stay-band-facts {
-  list-style: none;
-  margin: 1.1rem 0 1.5rem;
-  padding: 0;
-  display: grid;
-  gap: .55rem;
-}
-.stay-band-facts li {
-  position: relative;
-  padding-left: 1.15rem;
-  line-height: 1.45;
-}
-.stay-band-facts li::before {
-  content: "";
-  position: absolute;
-  left: 0; top: .58em;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--copper, #C2662B);
-}
-.stay-band-image {
-  width: 100%; height: 100%;
-  max-height: 380px;
-  object-fit: cover;
-  border-radius: 14px;
-}
-@media (max-width: 860px) {
-  .stay-band { grid-template-columns: 1fr; gap: 1.6rem; }
-  .stay-band-image { max-height: 260px; }
-  .cta-contacts { gap: 1rem 1.6rem; }
-}
-
-/* --- WhatsApp glyph beside a number or link ----------------------------- */
-/* Small — a marker beside the number, not a button. The green is set on the
-   SVG path itself, so it survives whatever colour the surrounding link is. */
-.wa-icon {
-  width: .82em; height: .82em;
-  flex: none;
-  vertical-align: -.08em;
-  margin-right: .34em;
-}
-a.has-wa { display: inline-flex; align-items: center; }
-
-/* Distinguishes the two numbers. One is WhatsApp, the other takes ordinary
-   calls only — without saying so, an overseas visitor tries WhatsApp on the
-   landline number and concludes nobody is answering. */
-.contact-kind {
-  display: inline-block;
-  font-size: .72rem;
-  letter-spacing: .04em;
-  opacity: .62;
-  white-space: nowrap;
-}
-.cta-contacts .contact-kind { display: block; margin-top: .1rem; }

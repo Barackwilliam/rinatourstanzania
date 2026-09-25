@@ -105,9 +105,8 @@ class Command(BaseCommand):
             name = f"{path.stem.lower().replace(' ', '-')}.jpg"
             content = ContentFile(data, name=name)
 
-            cover_field = self._cover_field(owner)
-            if i == cover_index and cover_field:
-                getattr(owner, cover_field).save(name, content, save=True)
+            if i == cover_index and hasattr(owner, "image"):
+                owner.image.save(name, content, save=True)
             else:
                 kwargs = {gallery_field: owner, "order": i}
                 item = gallery_model(**kwargs)
@@ -134,33 +133,6 @@ class Command(BaseCommand):
                 "\nOpen each image in the admin and write its alt text. A photo "
                 "with no description is invisible to a screen reader and to "
                 "search engines.")
-
-    # ------------------------------------------------------------------
-    @staticmethod
-    def _cover_field(owner):
-        """
-        Name of the field on this model that actually holds an uploaded file.
-
-        Package and Destination carry BOTH an `image` URLField, for pointing at
-        a photo hosted elsewhere, and an `image_upload` ImageField for a real
-        file. `hasattr(owner, "image")` was true for all of them, so the command
-        went for the URLField and called .save() on a plain string:
-
-            AttributeError: 'str' object has no attribute 'save'
-
-        Checking the field type rather than the attribute name picks the right
-        one on every model, including any added later.
-        """
-        from django.db.models import FileField
-
-        for candidate in ("image_upload", "image"):
-            try:
-                field = owner._meta.get_field(candidate)
-            except Exception:
-                continue
-            if isinstance(field, FileField):
-                return candidate
-        return None
 
     # ------------------------------------------------------------------
     def _resolve(self, target, slug):

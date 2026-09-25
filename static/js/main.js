@@ -100,77 +100,6 @@
     var dots = hero.querySelectorAll('.hero-dots button');
     var arrows = hero.querySelectorAll('.hero-arrow');
 
-    /* --- Hero video ----------------------------------------------------
-       The markup ships the video with preload="none" and the address in
-       data-hero-video rather than src, so nothing is fetched while the page
-       is still painting. We attach the source afterwards, and only where it
-       is worth the bytes: a hero clip is decoration, and on a metered phone
-       connection the poster image alone is the better page.
-
-       Skipped entirely when the visitor has Data Saver on, when the browser
-       reports a slow connection, on narrow screens, and when reduced motion
-       is asked for. In every one of those cases the poster stays put and the
-       page is complete without it. */
-    function heroVideoWanted() {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-      if (window.innerWidth < 820) return false;
-
-      var net = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (net) {
-        if (net.saveData) return false;
-        if (/2g|slow-2g|3g/.test(net.effectiveType || '')) return false;
-      }
-      return true;
-    }
-
-    /* Scoped to one slide, so a three-slide hero fetches one clip rather than
-       three. The rest arrive as the carousel reaches them. */
-    function loadHeroVideos(scope) {
-      if (!heroVideoWanted()) return;
-      var root = scope || hero.querySelector('.hero-slide.is-active') || hero;
-
-      root.querySelectorAll('video[data-hero-video]').forEach(function (video) {
-        var src = video.dataset.heroVideo;
-        if (!src || video.src) return;
-
-        video.preload = 'auto';
-        video.src = src;
-
-        /* Only reveal it once there are enough frames to play through without
-           stalling — swapping to a video that then buffers looks worse than
-           the still it replaced. */
-        video.addEventListener('canplaythrough', function () {
-          var playing = video.play();
-          if (playing && playing.catch) {
-            playing.catch(function () { /* autoplay refused; poster stays */ });
-          }
-          video.classList.add('is-ready');
-          var slide = video.closest('.hero-slide');
-          var poster = slide && slide.querySelector('.hero-media-poster');
-          if (poster) poster.classList.add('is-hidden');
-        }, { once: true });
-
-        /* A hero that fails to fetch should cost nothing but the poster. */
-        video.addEventListener('error', function () {
-          video.removeAttribute('src');
-        }, { once: true });
-      });
-    }
-
-    /* After load, not on DOMContentLoaded: the clip must queue behind the
-       text, the CSS and the real photographs, never in front of them. The flag
-       also stops the carousel pulling clips while the page is still painting. */
-    var pageLoaded = false;
-    function beginHeroVideo() {
-      pageLoaded = true;
-      setTimeout(function () { loadHeroVideos(); }, 400);
-    }
-    if (document.readyState === 'complete') {
-      beginHeroVideo();
-    } else {
-      window.addEventListener('load', beginHeroVideo, { once: true });
-    }
-
     if (slides.length > 1) {
       var index = 0;
       var timer = null;
@@ -189,8 +118,6 @@
             c.classList.add('is-active');
           }
         });
-        /* Fetch this slide's clip, if it has one and has not had it yet. */
-        if (pageLoaded) loadHeroVideos(slides[index]);
       }
 
       function start() {
@@ -394,33 +321,6 @@
     filterInput.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') { filterInput.value = ''; apply(); }
     });
-  }
-
-  /* --- Climb route map --------------------------------------------------
-     The route is drawn in full in the stylesheet. Here we opt into the
-     draw-on animation: add .is-ready to dash the line, then .is-drawing on
-     the next frame to animate it in. Doing it in that order means a visitor
-     whose script never runs simply sees the finished line rather than
-     nothing at all. */
-  var climbMap = document.querySelector('.climb-map-section');
-  if (climbMap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    function drawClimbMap() {
-      climbMap.classList.add('is-ready');
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () { climbMap.classList.add('is-drawing'); });
-      });
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries, obs) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          drawClimbMap();
-          obs.unobserve(entry.target);
-        });
-      }, { threshold: 0.25 }).observe(climbMap);
-    } else {
-      drawClimbMap();
-    }
   }
 
   /* --- Climb profile ----------------------------------------------------

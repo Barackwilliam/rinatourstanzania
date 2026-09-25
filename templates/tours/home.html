@@ -7,25 +7,13 @@
       <div class="hero-slide{% if forloop.first %} is-active{% endif %}" data-slide="{{ forloop.counter0 }}">
         <div class="hero-media-wrap">
           {% if slide.video %}
-            {% comment %} The poster shows immediately; the clip itself is fetched by
-               main.js after the page has loaded, and only on a connection that
-               can carry it. Previously `autoplay` with no `preload` hint meant
-               the browser pulled the whole file down before the visitor saw
-               anything — on the hero video currently attached, eighteen
-               megabytes of it. `preload="none"` and no `src` attribute are
-               what actually stop that; data-hero-video is picked up later. {% endcomment %}
-            <video class="hero-media" muted loop playsinline preload="none"
-                   data-hero-video="{{ slide.video.url }}"
-                   {% if slide.image %}poster="{{ slide.image.url }}"{% endif %}></video>
-            {% if slide.image %}
-              <img class="hero-media hero-media-poster" src="{{ slide.image.url }}" alt=""
-                   {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
-                   decoding="async">
-            {% endif %}
+            <video class="hero-media" autoplay muted loop playsinline
+                   {% if slide.image %}poster="{{ slide.image.url }}"{% endif %}>
+              <source src="{{ slide.video.url }}" type="video/mp4">
+            </video>
           {% elif slide.image %}
             <img class="hero-media" src="{{ slide.image.url }}" alt=""
-                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
-                 decoding="async">
+                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
           {% else %}
             <div class="hero-media hero-media-blank" data-tone="{{ forloop.counter0 }}"></div>
           {% endif %}
@@ -109,7 +97,7 @@
     <div class="category-grid">
       {% for c in categories %}
         <a class="category-tile" href="{{ c.get_absolute_url }}" style="--tile-bead:{{ c.bead_colour }}">
-          {% if c.image %}<img src="{{ c.image.url }}" alt="" width="400" height="300" loading="lazy" decoding="async">{% endif %}
+          {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy">{% endif %}
           <span class="category-tile-body">
             <span class="category-tile-name">{{ c.name }}</span>
             <span class="category-tile-count">{{ c.package_count }} tours</span>
@@ -165,41 +153,11 @@
     <div class="dest-grid">
       {% for d in destinations %}
         <a class="dest-tile" href="{{ d.get_absolute_url }}">
-          {% if d.get_image %}<img src="{{ d.get_image }}" alt="" width="400" height="300" loading="lazy" decoding="async">{% endif %}
+          {% if d.get_image %}<img src="{{ d.get_image }}" alt="" loading="lazy">{% endif %}
           <span class="dest-tile-name">{{ d.name }}</span>
         </a>
       {% endfor %}
     </div>
-  </div>
-</section>
-{% endif %}
-
-{% if stay %}
-{% comment %}
-  The guest house, on the homepage rather than only behind the top nav. It is
-  a real part of what Rina sells — bed and breakfast a quarter of an hour from
-  the airport — and a climber looking for somewhere to sleep the night before
-  the gate should not have to go hunting for it.
-{% endcomment %}
-<section class="section section-alt">
-  <div class="container stay-band">
-    <div class="stay-band-copy">
-      <h2>Where you'll stay</h2>
-      <p>{{ stay.short_description|default:stay.name }}</p>
-      <ul class="stay-band-facts">
-        {% if stay.price_from %}
-          <li><strong>From ${{ stay.price_from|floatformat:0 }}</strong> per person, bed &amp; breakfast</li>
-        {% endif %}
-        <li>About 13&nbsp;km from Kilimanjaro International Airport — 9 to 15 minutes</li>
-        <li>Kitchen open to guests; cook for yourself if you'd rather</li>
-        <li>Kilimanjaro and Meru both in view, and the birds that come with the trees</li>
-      </ul>
-      <a class="btn btn-primary" href="{% url 'tours:stay' %}">See the guest house</a>
-    </div>
-    {% if stay.get_image %}
-      <img class="stay-band-image" src="{{ stay.get_image }}" alt="{{ stay.name }}"
-           width="600" height="450" loading="lazy" decoding="async">
-    {% endif %}
   </div>
 </section>
 {% endif %}
@@ -235,45 +193,10 @@
 </section>
 {% endif %}
 
-{% comment %}
-  The CTA band, with the actual contact details in it rather than only a link
-  to the contact page. Most enquiries arrive on WhatsApp, and a visitor who
-  has just scrolled the whole homepage should be able to start typing without
-  one more click.
-{% endcomment %}
-<section class="section cta-band" id="contact">
+<section class="section cta-band">
   <div class="container">
     <h2>Tell us what you have in mind</h2>
     <p>Dates, budget, how long you have — we'll come back with a plan that fits.</p>
-
-    <ul class="cta-contacts">
-      {% if SITE_WHATSAPP %}
-        <li>
-          <span class="cta-contact-label">WhatsApp</span>
-          <a class="has-wa" href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">{% include "tours/partials/whatsapp_icon.html" %}
-            {{ SITE_WHATSAPP_DISPLAY|default:SITE_WHATSAPP }}</a>
-        </li>
-      {% endif %}
-      {% if SITE_PHONE_PRIMARY %}
-        <li>
-          <span class="cta-contact-label">Call &middot; local line</span>
-          <a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a>
-        </li>
-      {% endif %}
-      {% if SITE_EMAIL %}
-        <li>
-          <span class="cta-contact-label">Email</span>
-          <a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>
-        </li>
-      {% endif %}
-      {% if SITE_EMAIL_SECONDARY %}
-        <li>
-          <span class="cta-contact-label">Email</span>
-          <a href="mailto:{{ SITE_EMAIL_SECONDARY }}">{{ SITE_EMAIL_SECONDARY }}</a>
-        </li>
-      {% endif %}
-    </ul>
-
     <a class="btn btn-primary" href="{% url 'tours:contact' %}">Start planning</a>
   </div>
 </section>

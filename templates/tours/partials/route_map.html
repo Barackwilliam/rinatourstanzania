@@ -49,9 +49,9 @@
         </svg>
       </figure>
 
-      {% comment %} On a phone this sits immediately under the map so the two read as one
+      {# On a phone this sits immediately under the map so the two read as one
          thing. Selecting a route dims the others and opens its stops here,
-         which is the only way a six-line map is legible at that width. {% endcomment %}
+         which is the only way a six-line map is legible at that width. #}
       <div class="routes-legend-wrap">
         <ul class="routes-legend">
           {% for route in map_routes %}

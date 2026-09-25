@@ -38,9 +38,9 @@
     </svg>
   </div>
 
-  {% comment %} The chart shows the shape; this list carries the names and numbers. On a
+  {# The chart shows the shape; this list carries the names and numbers. On a
      phone that is the part people actually read, so it is a list rather than
-     labels crammed onto the drawing. {% endcomment %}
+     labels crammed onto the drawing. #}
   <ol class="climb-camp-list">
     {% for pt in profile.points %}
       <li class="climb-camp-row{% if pt.stage.altitude_m == summit.altitude_m %} is-summit{% endif %}"

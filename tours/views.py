@@ -1,16 +1,15 @@
 from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Count, Min, Prefetch, Q
+from django.db.models import Min, Prefetch, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ContactForm
 from .data.tanzania_map import OUTLINES, VIEWBOX
-from .data import kilimanjaro_map as kili
 from .models import (
     Accommodation, Category, Destination, FAQ, HeroSlide, MapRoute, Package,
-    RouteStop, TeamMember, TransferService, Testimonial,
+    TeamMember, TransferService, Testimonial,
 )
 
 
@@ -19,32 +18,18 @@ def _published():
 
 
 def home(request):
-    # The tour cards read package.primary_category for the bead colour and the
-    # label, so select_related keeps six cards at one query instead of seven.
-    cards = _published().select_related("primary_category")
-
     context = {
         "slides": HeroSlide.objects.filter(active=True),
-        # annotate rather than calling Category.package_count() in the template:
-        # the tile grid was one COUNT query per category.
-        "categories": (
-            Category.objects.filter(featured=True)
-            .annotate(package_count=Count("packages", distinct=True))
-        ),
-        "featured_packages": cards.filter(featured=True)[:6],
-        "day_trips": cards.filter(duration_days=1)[:6],
+        "categories": Category.objects.filter(featured=True),
+        "featured_packages": _published().filter(featured=True)[:6],
+        "day_trips": _published().filter(duration_days=1)[:6],
         "destinations": Destination.objects.filter(featured=True)[:8],
         "transfers": TransferService.objects.filter(active=True),
-        # The guest house is one of the things the client most wanted visible,
-        # and it was reachable only from the top nav.
-        "stay": Accommodation.objects.filter(active=True).first(),
         "testimonials": Testimonial.objects.filter(featured=True)[:6],
         "map_routes": (
             MapRoute.objects.filter(active=True)
             .select_related("package")
-            .prefetch_related(
-                Prefetch("stops", queryset=RouteStop.objects.select_related("destination"))
-            )
+            .prefetch_related("stops__destination")
         ),
         "total_packages": _published().count(),
         "map_outlines": OUTLINES,
@@ -88,9 +73,7 @@ def package_list(request):
         "active_category": category,
         "active_destination": destination,
         "query": query,
-        # the paginator has already counted; asking the queryset again was a
-        # second COUNT over the same filtered set.
-        "total": page.paginator.count,
+        "total": packages.count(),
     }
     return render(request, "tours/package_list.html", context)
 
@@ -131,59 +114,12 @@ def package_detail(request, slug):
     )
     related = (
         _published()
-        .select_related("primary_category")
         .filter(categories__in=package.categories.all())
         .exclude(pk=package.pk)
         .distinct()[:3]
     )
-    context = {"package": package, "related": related}
-    if package.climb_route_id:
-        context.update(_kilimanjaro_map_context())
-    return render(request, "tours/package_detail.html", context)
-
-
-def _kilimanjaro_map_context():
-    """
-    Geometry for the plan-view climb map.
-
-    Projected here rather than in the template because Django templates cannot
-    do arithmetic, and rather than in the model because none of it depends on
-    which route is being drawn — it is the same mountain every time.
-    """
-    contours = []
-    for i, c in enumerate(kili.CONTOURS):
-        ring = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*c)))
-        # Opacity is computed here and written onto the element as a plain
-        # attribute. It used to be a CSS `calc()` over a custom property, and
-        # where that failed to parse the opacity fell back to 1 — so all seven
-        # rings painted at full strength on top of each other and the map came
-        # out as a solid black blob. A number in the markup cannot fail that way.
-        ring["opacity"] = round(0.045 + i * 0.022, 3)
-        contours.append(ring)
-
-    mawenzi = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.MAWENZI)))
-    mawenzi["opacity"] = 0.10
-    shira = dict(zip(("cx", "cy", "rx", "ry"), _ellipse(*kili.SHIRA_PLATEAU)))
-    shira["opacity"] = 0.10
-
-    return {
-        "map_viewbox": kili.VIEWBOX,
-        "map_contours": contours,
-        "map_mawenzi": mawenzi,
-        "map_shira": shira,
-        "map_landmarks": [
-            {"name": name, "x": kili.project(lon, lat)[0], "y": kili.project(lon, lat)[1]}
-            for name, lon, lat in kili.LANDMARKS
-        ],
-    }
-
-
-def _ellipse(lon, lat, r_lon, r_lat):
-    """Centre plus radii in degrees -> centre plus radii in SVG units."""
-    cx, cy = kili.project(lon, lat)
-    edge_x, _ = kili.project(lon + r_lon, lat)
-    _, edge_y = kili.project(lon, lat + r_lat)
-    return cx, cy, round(abs(edge_x - cx), 1), round(abs(edge_y - cy), 1)
+    return render(request, "tours/package_detail.html",
+                  {"package": package, "related": related})
 
 
 def category_list(request):
@@ -193,16 +129,13 @@ def category_list(request):
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    packages = (
-        _published().filter(categories=category)
-        .select_related("primary_category").distinct()
-    )
+    packages = _published().filter(categories=category).distinct()
     page = Paginator(packages, 12).get_page(request.GET.get("page"))
     return render(request, "tours/category_detail.html", {
         "category": category,
         "packages": page,
         "page_obj": page,
-        "total": page.paginator.count,
+        "total": packages.count(),
     })
 
 
@@ -217,16 +150,13 @@ def destination_list(request):
 
 def destination_detail(request, slug):
     destination = get_object_or_404(Destination, slug=slug)
-    packages = (
-        _published().filter(destinations=destination)
-        .select_related("primary_category").distinct()
-    )
+    packages = _published().filter(destinations=destination).distinct()
     return render(request, "tours/destination_detail.html",
                   {"destination": destination, "packages": packages})
 
 
 def day_trip_list(request):
-    packages = _published().filter(duration_days=1).select_related("primary_category")
+    packages = _published().filter(duration_days=1)
     return render(request, "tours/day_trip_list.html", {"packages": packages})
 
 

@@ -177,14 +177,6 @@ class Package(models.Model):
 
     class Meta:
         ordering = ["order", "duration_days", "title"]
-        indexes = [
-            # Every listing page starts from published=True, and the homepage
-            # and day-trip page narrow it further. Without these Postgres scans
-            # the whole table on each one.
-            models.Index(fields=["published", "featured"], name="pkg_pub_feat_idx"),
-            models.Index(fields=["published", "duration_days"], name="pkg_pub_days_idx"),
-            models.Index(fields=["order", "duration_days", "title"], name="pkg_order_idx"),
-        ]
 
     def __str__(self):
         return self.title
@@ -526,36 +518,17 @@ class MapRoute(models.Model):
     class Meta:
         ordering = ["order", "name"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._points_cache = None
-        self._offset_cache = None
-
     def __str__(self):
         return self.name
 
     def points(self):
-        """
-        Projected SVG points for every stop that has coordinates.
-
-        `stops.all()` rather than `stops.select_related(...)`: the homepage
-        prefetches `stops__destination`, and any queryset method on the related
-        manager throws that prefetched cache away and re-queries. Six routes
-        each asked for their stops three times per template call was 43 of the
-        homepage's 71 queries.
-
-        The result is memoised on the instance too — `path_d`, `path_length`
-        and `marker_points` all want the same list, and `marker_points` is
-        rendered twice (map markers, then the legend).
-        """
-        if self._points_cache is None:
-            out = []
-            for stop in self.stops.all():
-                point = stop.destination.map_point()
-                if point:
-                    out.append((stop.destination, point))
-            self._points_cache = out
-        return self._points_cache
+        """Projected SVG points for every stop that has coordinates."""
+        out = []
+        for stop in self.stops.select_related("destination"):
+            point = stop.destination.map_point()
+            if point:
+                out.append((stop.destination, point))
+        return out
 
     def _offset_points(self):
         """
@@ -564,19 +537,14 @@ class MapRoute(models.Model):
         three of them — and without this the lines sit exactly on top of one
         another and only the last one drawn is visible.
         """
-        if self._offset_cache is not None:
-            return self._offset_cache
-
         pts = [p for _d, p in self.points()]
         if len(pts) < 2:
-            self._offset_cache = pts
             return pts
         # alternate sides, widening slightly for each successive route
         step = (self.order + 1) // 2
         side = 1 if self.order % 2 == 0 else -1
         shift = side * step * 5.0
         if shift == 0:
-            self._offset_cache = pts
             return pts
 
         out = []
@@ -587,7 +555,6 @@ class MapRoute(models.Model):
             dx, dy = bx - ax, by - ay
             length = (dx * dx + dy * dy) ** 0.5 or 1.0
             out.append((x + (-dy / length) * shift, y + (dx / length) * shift))
-        self._offset_cache = out
         return out
 
     def path_d(self):
@@ -667,156 +634,11 @@ class ClimbRoute(models.Model):
     class Meta:
         ordering = ["order", "name"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._map_cache = None
-
     def __str__(self):
         return f"{self.mountain} — {self.name}"
 
     def stage_list(self):
         return list(self.stages.all())
-
-    def map_stages(self):
-        """
-        Camps that have a position, in walking order, with duplicates collapsed.
-
-        Marangu and Rongai come back down through camps they already passed, so
-        the raw stage list repeats Horombo and Marangu Gate. On a profile that
-        repetition is the point — it shows the descent. On a plan view it would
-        just draw the line back over itself, so the second visit is dropped and
-        the marker keeps the day of the first.
-        """
-        if self._map_cache is None:
-            seen, out = set(), []
-            for stage in self.stage_list():
-                point = stage.map_point()
-                if point is None or stage.name in seen:
-                    continue
-                seen.add(stage.name)
-                out.append({
-                    "stage": stage,
-                    "x": point[0],
-                    "y": point[1],
-                    "verified": stage.coords_verified,
-                })
-            self._map_cache = out
-        return self._map_cache
-
-    def has_map(self):
-        """Two placed camps is the minimum that draws as a route."""
-        return len(self.map_stages()) >= 2
-
-    def map_unverified(self):
-        """How many placed camps nobody has confirmed yet."""
-        return sum(1 for s in self.map_stages() if not s["verified"])
-
-    @staticmethod
-    def _smooth_path(pts):
-        """
-        A smooth path through a list of points, same Catmull-Rom treatment as
-        the country map so the two read as the same family of drawing.
-        """
-        if len(pts) < 2:
-            return ""
-        if len(pts) == 2:
-            (x1, y1), (x2, y2) = pts
-            return f"M{x1:.1f},{y1:.1f} L{x2:.1f},{y2:.1f}"
-
-        d = [f"M{pts[0][0]:.1f},{pts[0][1]:.1f}"]
-        for i in range(len(pts) - 1):
-            p0 = pts[i - 1] if i > 0 else pts[i]
-            p1, p2 = pts[i], pts[i + 1]
-            p3 = pts[i + 2] if i + 2 < len(pts) else p2
-            c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
-            c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
-            d.append(f"C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} "
-                     f"{p2[0]:.1f},{p2[1]:.1f}")
-        return " ".join(d)
-
-    def _summit_index(self):
-        """Where the highest camp falls in the plotted list."""
-        stages = self.map_stages()
-        if not stages:
-            return 0
-        return max(range(len(stages)), key=lambda i: stages[i]["stage"].altitude_m)
-
-    def map_path_d(self):
-        """The climb up: gate to summit."""
-        pts = [(s["x"], s["y"]) for s in self.map_stages()]
-        return self._smooth_path(pts[:self._summit_index() + 1])
-
-    def map_descent_d(self):
-        """
-        The way down, drawn separately.
-
-        Rongai summits and then walks out over Marangu; Machame comes down to
-        Mweka. Drawn as one line with the ascent, the descent crosses back over
-        the climb and the whole thing reads as a mistake. Split and dashed, the
-        crossing becomes the information: you do not come down the way you went
-        up.
-        """
-        pts = [(s["x"], s["y"]) for s in self.map_stages()]
-        return self._smooth_path(pts[self._summit_index():])
-
-    def map_path_length(self):
-        """Length of the ascent line, for the draw-on animation."""
-        pts = [(s["x"], s["y"]) for s in self.map_stages()][:self._summit_index() + 1]
-        total = 0.0
-        for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
-            total += ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
-        return round(total * 1.15) or 1
-
-    def map_viewbox(self):
-        """
-        A viewBox cropped to this route rather than the whole mountain.
-
-        The projection has to cover every route — Lemosho starts far west,
-        Rongai far north — so on one fixed frame any single route sits small in
-        the middle with a lot of empty contour around it. Cropping to the
-        route's own extent lets each one fill its panel, and because the relief
-        is drawn in the same coordinate space it simply crops with it, which
-        reads as zooming into the mountain.
-
-        Padded generously and held to the base aspect ratio so the ellipses
-        stay round and short routes are not blown up past what the approximate
-        positions can honestly support.
-        """
-        from .data.kilimanjaro_map import WIDTH, HEIGHT, VIEWBOX
-
-        pts = [(s["x"], s["y"]) for s in self.map_stages()]
-        if len(pts) < 2:
-            return VIEWBOX
-
-        xs, ys = [p[0] for p in pts], [p[1] for p in pts]
-        min_x, max_x = min(xs), max(xs)
-        min_y, max_y = min(ys), max(ys)
-
-        pad = max((max_x - min_x), (max_y - min_y)) * 0.35 + 40
-        min_x, max_x = min_x - pad, max_x + pad
-        min_y, max_y = min_y - pad, max_y + pad
-
-        # Match the base aspect so nothing is squashed.
-        aspect = WIDTH / HEIGHT
-        w, h = max_x - min_x, max_y - min_y
-        if w / h < aspect:
-            grow = (h * aspect - w) / 2
-            min_x, max_x = min_x - grow, max_x + grow
-        else:
-            grow = (w / aspect - h) / 2
-            min_y, max_y = min_y - grow, max_y + grow
-
-        # Never zoom in so far that a camp drifting by a kilometre would look
-        # like a serious error — below about half the frame the approximation
-        # starts claiming more than it knows.
-        if (max_x - min_x) < WIDTH * 0.5:
-            cx, cy = (min_x + max_x) / 2, (min_y + max_y) / 2
-            half_w, half_h = WIDTH * 0.25, HEIGHT * 0.25
-            min_x, max_x = cx - half_w, cx + half_w
-            min_y, max_y = cy - half_h, cy + half_h
-
-        return (f"{min_x:.0f} {min_y:.0f} "
-                f"{max_x - min_x:.0f} {max_y - min_y:.0f}")
 
     def summit(self):
         stages = self.stage_list()
@@ -877,26 +699,6 @@ class ClimbStage(models.Model):
     name = models.CharField(max_length=100)
     altitude_m = models.PositiveIntegerField(help_text="Metres above sea level")
     day = models.PositiveIntegerField(blank=True, null=True)
-
-    # Position on the mountain, for the plan-view route map. Seeded from
-    # tours/data/kilimanjaro_map.py with approximate figures — see that file.
-    latitude = models.FloatField(
-        blank=True, null=True,
-        help_text="Decimal degrees, negative south of the equator. Leave blank "
-                  "and this camp is left off the map rather than guessed at.")
-    longitude = models.FloatField(blank=True, null=True, help_text="Decimal degrees.")
-    coords_verified = models.BooleanField(
-        default=False,
-        help_text="Tick once a guide who has walked this camp has confirmed the "
-                  "position. While any camp on a route is unticked, the map "
-                  "carries a 'positions approximate' note.")
-
-    def map_point(self):
-        """SVG coordinates on the Kilimanjaro map, or None if not placed."""
-        if self.latitude is None or self.longitude is None:
-            return None
-        from .data.kilimanjaro_map import project
-        return project(self.longitude, self.latitude)
 
     class Meta:
         ordering = ["order", "id"]

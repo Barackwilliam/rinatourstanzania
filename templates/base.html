@@ -12,41 +12,17 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
 <meta property="og:description" content="{% block og_description %}Safaris, treks and beach holidays across Tanzania.{% endblock %}">
-{% comment %}
-  A page with its own photograph overrides og_image; everything else falls
-  back to the logo, so a link shared on WhatsApp is never a blank card.
-  WhatsApp is where most of Rina's enquiries start.
-{% endcomment %}
-{% block og_image %}
-  <meta property="og:image" content="{{ SITE_DOMAIN }}{% static 'img/brand/og-image.png' %}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-{% endblock %}
+{% block og_image %}{% endblock %}
 <meta name="twitter:card" content="summary_large_image">
-
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/rtz-logo-32.png' %}">
-<link rel="icon" type="image/png" sizes="180x180" href="{% static 'img/brand/rtz-logo-180.png' %}">
-<link rel="apple-touch-icon" href="{% static 'img/brand/rtz-logo-180.png' %}">
-<meta name="theme-color" content="#2E1B12">
 
 {% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
 
-{% comment %} Our own CSS first and blocking — it is what the page needs to lay out.
-   Google Fonts follows, but non-blocking: the media="print" trick lets the
-   browser fetch it without holding up first paint, then flips it to all once
-   it lands. display=swap means text is readable in the fallback face in the
-   meantime instead of invisible. On a slow connection this was two extra
-   round trips to a third-party host before anything appeared. {% endcomment %}
-<link rel="stylesheet" href="{% static 'css/motifs.css' %}">
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
-<noscript>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
-</noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/motifs.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 <script type="application/ld+json">
 {
@@ -93,8 +69,7 @@
   <div class="container header-inner">
 
     <a class="brand" href="{% url 'tours:home' %}">
-      <img class="brand-mark" src="{% static 'img/brand/rtz-logo-512.png' %}"
-           alt="" width="168" height="168" fetchpriority="high" decoding="async">
+      <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-text">
         <span class="brand-name">{{ SITE_NAME }}</span>
         <span class="brand-tagline">{% if SITE_TAGLINE %}{{ SITE_TAGLINE }}{% else %}Tanzania, at your pace{% endif %}</span>
@@ -183,7 +158,7 @@
               {% if nav_promoted %}
               <a class="mega-promo" href="{{ nav_promoted.get_absolute_url }}">
                 <span class="mega-promo-media">
-                  {% if nav_promoted.get_image %}<img src="{{ nav_promoted.get_image }}" alt="" width="320" height="200" loading="lazy" decoding="async">{% endif %}
+                  {% if nav_promoted.get_image %}<img src="{{ nav_promoted.get_image }}" alt="" loading="lazy">{% endif %}
                 </span>
                 <span class="mega-promo-body">
                   <span class="mega-promo-label">Most booked</span>
@@ -245,7 +220,7 @@
       {% if SITE_PHONE_PRIMARY or SITE_WHATSAPP or SITE_EMAIL %}
         <div class="drawer-foot">
           {% if SITE_PHONE_PRIMARY %}<a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a>{% endif %}
-          {% if SITE_WHATSAPP %}<a class="has-wa" href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">{% include "tours/partials/whatsapp_icon.html" %}WhatsApp us</a>{% endif %}
+          {% if SITE_WHATSAPP %}<a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">WhatsApp us</a>{% endif %}
           {% if SITE_EMAIL %}<a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a>{% endif %}
         </div>
       {% endif %}
@@ -303,11 +278,10 @@
     <div>
       <p class="footer-heading">Get in touch</p>
       <ul class="footer-links">
-        {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a> <span class="contact-kind">local line, calls only</span></li>{% endif %}
+        {% if SITE_PHONE_PRIMARY %}<li><a href="tel:{{ SITE_PHONE_PRIMARY|cut:' ' }}">{{ SITE_PHONE_PRIMARY }}</a></li>{% endif %}
         {% if SITE_PHONE_SECONDARY %}<li><a href="tel:{{ SITE_PHONE_SECONDARY|cut:' ' }}">{{ SITE_PHONE_SECONDARY }}</a></li>{% endif %}
         {% if SITE_EMAIL %}<li><a href="mailto:{{ SITE_EMAIL }}">{{ SITE_EMAIL }}</a></li>{% endif %}
-        {% if SITE_EMAIL_SECONDARY %}<li><a href="mailto:{{ SITE_EMAIL_SECONDARY }}">{{ SITE_EMAIL_SECONDARY }}</a></li>{% endif %}
-        {% if SITE_WHATSAPP %}<li><a class="has-wa" href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">{% include "tours/partials/whatsapp_icon.html" %}{{ SITE_WHATSAPP_DISPLAY|default:"WhatsApp" }}</a></li>{% endif %}
+        {% if SITE_WHATSAPP %}<li><a href="https://wa.me/{{ SITE_WHATSAPP }}" rel="noopener" target="_blank">WhatsApp</a></li>{% endif %}
       </ul>
     </div>
   </div>
@@ -334,9 +308,7 @@
   </div>
 </footer>
 
-{% comment %} defer: the browser can keep building the page while this downloads, and it
-   runs once the DOM is there. Nothing in main.js needs to run earlier. {% endcomment %}
-<script defer src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

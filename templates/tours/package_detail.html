@@ -48,8 +48,7 @@
     {% endif %}
 
     {% if package.climb_route %}
-      {% with climb=package.climb_route summit=package.climb_route.summit %}
-        {% include "tours/partials/climb_map.html" %}
+      {% with climb=package.climb_route %}
         {% include "tours/partials/climb_profile.html" %}
       {% endwith %}
     {% endif %}
